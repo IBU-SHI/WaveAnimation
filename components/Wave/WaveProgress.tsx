@@ -16,10 +16,11 @@ type Props = {
   style?: StyleProp<ViewStyle | TextStyle | ImageStyle>;
   waveColor?: string;
   waveLightColor?: string;
+  waveLight?:boolean;
   animated?:boolean;
 };
 
-export const WaveProgress = ({size, value, style,waveColor='#141516',waveLightColor='#9398A1',animated=true}: Props) => {
+export const WaveProgress = ({size, value, style,waveColor='#141516',waveLightColor='#9398A1',waveLight=true,animated=true}: Props) => {
   const radius = size * 0.5; // radius
 
   const fillPercent = Math.max(0, Math.min(size, value)) / size; // percent of how much progress filled
@@ -135,7 +136,7 @@ export const WaveProgress = ({size, value, style,waveColor='#141516',waveLightCo
   return (
     <View style={style}>
       <Canvas style={{width: size, height: size}}>
-        <Path path={clipPathLight} color={waveLightColor} />
+       {waveLight && <Path path={clipPathLight} color={waveLightColor} />}
         <Path path={clipPath} color={waveColor} />
       </Canvas>
     </View>
