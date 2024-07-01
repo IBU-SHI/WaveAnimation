@@ -3,6 +3,9 @@
 
 A brief description of what this project does and who it's for
 
+## ScreenShot
+
+![alt text](image.png)
 
 ## Features
 
@@ -21,6 +24,8 @@ A brief description of what this project does and who it's for
 | Default Wave Light Color | ![#9398A1](https://via.placeholder.com/10/9398A1?text=+) #9398A1 |
 | Default Wave Color | ![#141516](https://via.placeholder.com/10/141516?text=+) #141516 |
 
-## ScreenShot
+## Demo
 
-![alt text](image.png)
+https://github.com/IBU-SHI/WaveAnimation/assets/91561445/f8b25f6a-45ef-4b69-b8f7-8811161016e2
+
+
