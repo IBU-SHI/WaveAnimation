@@ -3,7 +3,7 @@ import {View, Text, StyleSheet} from 'react-native';
 import {WaveProgress} from './WaveProgress';
 
 const Wave = () => {
-  const value = 100;
+  const value = 60;
   const size = 180;
   const percentage = (value / size) * 100;
 
