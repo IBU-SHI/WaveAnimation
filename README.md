@@ -26,3 +26,6 @@ A brief description of what this project does and who it's for
 
 ## Demo
 
+https://github.com/IBU-SHI/WaveAnimation/assets/91561445/f8b25f6a-45ef-4b69-b8f7-8811161016e2
+
+
