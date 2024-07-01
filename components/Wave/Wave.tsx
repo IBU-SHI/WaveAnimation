@@ -3,14 +3,14 @@ import {View, Text, StyleSheet} from 'react-native';
 import {WaveProgress} from './WaveProgress';
 
 const Wave = () => {
-  const value = 60;
+  const value = 120;
   const size = 180;
   const percentage = (value / size) * 100;
 
   return (
     <View style={styles(size).viewAddImg}>
       <View style={{alignItems: 'center'}}>
-        {percentage >= 90 ? (
+        {percentage >= 96 ? (
           <View style={styles(size).waveViewAfter90Per} />
         ) : (
           <WaveProgress
