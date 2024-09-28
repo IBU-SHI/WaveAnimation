@@ -1,15 +1,20 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {WaveProgress} from './WaveProgress';
+import { View, Text, StyleSheet } from 'react-native';
+import { WaveProgress } from './WaveProgress';
 
-const Wave = () => {
+export const Wave = () => {
   const value = 120;
   const size = 180;
   const percentage = (value / size) * 100;
 
   return (
+  <View>
+    <View style={styles().sectionTitleContainer}>
+      <Text style={styles().sectionTitle}>Water Drop Wave Animation</Text>
+      <Text style={styles().sectionText}>Using Skia, Reanimated</Text>
+    </View>
     <View style={styles(size).viewAddImg}>
-      <View style={{alignItems: 'center'}}>
+      <View style={{ alignItems: 'center' }}>
         {percentage >= 96 ? (
           <View style={styles(size).waveViewAfter90Per} />
         ) : (
@@ -28,7 +33,7 @@ const Wave = () => {
         <Text style={styles(size).textsetwater}>{percentage.toFixed()}%</Text>
         <Text style={styles(size).textConsumption}>Consumption</Text>
       </View>
-      <View style={{marginTop:10}}>
+      <View style={{ marginTop: 10 }}>
         <Text style={styles(size).textInfo}>Size:- {size}</Text>
         <Text style={styles(size).textInfo}>Value:- {value}</Text>
         <Text style={styles(size).textInfo}>WaveColorLight:- {"#1B65DE"}</Text>
@@ -36,11 +41,13 @@ const Wave = () => {
         <Text style={styles(size).textInfo}>Need config RTL</Text>
 
       </View>
+
     </View>
+  </View>
   );
 };
 
-const styles = (size: number) =>
+const styles = (size: number = 0) =>
   StyleSheet.create({
     waveBall: {
       alignSelf: 'center',
@@ -63,7 +70,7 @@ const styles = (size: number) =>
       height: size,
       overflow: 'hidden',
       //transform: [{ rotateZ: I18nManager.isRTL ? '-45deg' : '45deg' }],
-      transform: [{rotateZ: '45deg'}],
+      transform: [{ rotateZ: '45deg' }],
       width: size,
     },
     waveViewAfter90Per: {
@@ -78,14 +85,14 @@ const styles = (size: number) =>
       overflow: 'hidden',
       position: 'absolute',
       //transform: [{ rotateZ: I18nManager.isRTL ? '-45deg' : '45deg' }],
-      transform: [{rotateZ: '45deg'}],
+      transform: [{ rotateZ: '45deg' }],
       width: size,
     },
     viewAddImg: {
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: 20,
-      marginTop: 60,
+      marginTop: 100,
     },
     viewTextComp: {
       alignSelf: 'center',
@@ -110,6 +117,25 @@ const styles = (size: number) =>
       top: 10,
       fontSize: 14,
       fontWeight: '700',
+    },
+    sectionContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    sectionTitleContainer: {
+      marginTop: 24,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    sectionTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: 'black',
+    },
+    sectionText: {
+      fontSize: 16,
+      color: 'black',
     },
   });
 export default Wave;
