@@ -3,15 +3,15 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 const HomeScreen = ({ navigation }) => {
     return (
-        <View>
+        <View style={{flex:1,gap:8}}>
             <TouchableOpacity
                 onPress={() => navigation.navigate('Water Drop')}
-                style={styles.button}>
+                style={[styles.button,{marginTop:16}]}>
                 <Text style={styles.buttonText}>Water drop animation</Text>
             </TouchableOpacity>
             <TouchableOpacity
                 onPress={() => navigation.navigate('Bar Graph')}
-                style={styles.button}>
+                style={[styles.button,{backgroundColor:'red'}]}>
                 <Text style={styles.buttonText}>Bar Graph</Text>
             </TouchableOpacity>
         </View>
@@ -22,7 +22,6 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     button: {
         backgroundColor: '#6495ED',
-        marginTop: 16,
         padding: 12,
         marginHorizontal: 16,
         borderRadius: 8
@@ -30,7 +29,7 @@ const styles = StyleSheet.create({
     buttonText: {
         textAlign: 'center',
         fontSize: 16,
-        fontWeight: 700,
+        fontWeight: 'bold',
         color: 'white'
     }
 
