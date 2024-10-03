@@ -15,7 +15,9 @@ const height = Dimensions.get('window').height; // this is width of screen
 
 function BarGraph() {
 
-  const [currentData, setCurrentData] = useState(data) //current week data ....more testing need
+  const [currentData, setCurrentData] = useState(data.slice(0, 7)) //current week data ....more testing need
+  const [yAxisData, setYAxisData] = useState(data.slice(0, 8)) //current week data ....more testing need
+  const [dateRange, setDateRange] = useState('1-7 Oct 2024')
 
   const progess = useSharedValue<number>(0); // this is progress value use for animation
   const selectedValue = useSharedValue<number>(0); // this is selected value (for tool tip purpose in future)
@@ -28,7 +30,7 @@ function BarGraph() {
   const yAxisWidth = 30
   const graphWidth = barWidth * data.length * 2 - yAxisWidth;//this is width of graph
   const graphMargin = 40  //this is bottom margin of graph
-  const graphHeight = (height / 3) - graphMargin  //this is heigt of graph
+  const graphHeight = canvasHeight - graphMargin  //this is heigt of graph
 
   const totalBars = data.length;
   const totalBarWidth = totalBars * barWidth;
@@ -37,14 +39,14 @@ function BarGraph() {
   const barSpacing = availableWidth / (totalBars - 1);// Calculate the spacing between bars
 
   const xRange = [0, graphWidth] //this is x axis range means scale length starting and ending
-  const xDomain = data.map((dataPoint: Data) => dataPoint.label) //this is x axis label 
+  const xDomain = data.map((dataPoint: Data) => dataPoint.date) //this is x axis label 
 
   const x = d3.scalePoint().domain(xDomain).range(xRange).padding(1) //here using of D3 as per lenght of domain it divide the range 
   // means range is 0 to 100 and domain is 5 is step would be 0,25,50,75,100
   // padding is space between bars
 
   const yRange = [0, graphHeight] //this is y axis range means scale length starting and ending
-  var yMax = d3.max(currentData, (yDataPoint: Data) => yDataPoint.value)! * 1.2; // 20% more than max value for scaling
+  var yMax = d3.max(yAxisData, (yDataPoint: Data) => yDataPoint.value)! * 1.2; // 20% more than max value for scaling
   const yDomain = [0, yMax]; // this is y axis label till maximum value in the data table
 
   const y = d3.scaleLinear().domain(yDomain).range(yRange) // this is line which made by connecting values of data 
@@ -69,22 +71,34 @@ function BarGraph() {
   };
 
   const onScroll = (event: any) => {
-    var contentOffsetX = event.nativeEvent.contentOffset.x;
+    const currentPosition = event.nativeEvent.contentOffset.x; // Current scroll position
 
-    // Calculate the start index based on contentOffsetX and the width of each bar
-    const currentIndex = Math.floor(((canvasWidth - (barWidth + barSpacing)) - (contentOffsetX)) / (barWidth + barSpacing));
-    const startIndex = currentIndex + 1
+    const contentWidth = event.nativeEvent.contentSize.width; // Total width of the scrollable content
+    const layoutWidth = event.nativeEvent.layoutMeasurement.width; // Width of the visible area
 
-    // Calculate how many bars are visible within the canvasWidth
-    const visibleBarsCount = Math.ceil(canvasWidth / (barWidth + barSpacing));
+    // Calculate the maximum scrollable position (max scroll)
+    const maxScroll = contentWidth - layoutWidth;
+    if (currentPosition < maxScroll) {
+      // Calculate the visible start and end indices
+      var start = data.length - Math.floor(currentPosition / (barWidth + barSpacing)); // Starting bar based on scroll
+      var end = data.length - Math.ceil((currentPosition +
+        event.nativeEvent.layoutMeasurement.width - ((barWidth + (barSpacing * 1.5)))) / (barWidth + barSpacing)); // Ending bar based on scroll + visible width
+      if (start > 0 && end < data.length - 6) {
+        start = start - 2
+        end = end - 1
+      }
+      else {
+        start = start - 1
 
-    // End index is just the start index + number of visible bars
-    const endIndex = startIndex + visibleBarsCount;
-
-    // // Get the visible items
-    const currentVisibleItems = data.slice(startIndex, endIndex);
-    setCurrentData(currentVisibleItems);
+      }
+      setDateRange(data[end]?.date + '-' + data[start]?.date + ' Oct 2024')
+      const currentVisibleItems = data.slice(end, start + 1);
+      setCurrentData(currentVisibleItems);
+      const currentVisibleYAxis = data.slice(end, start + 2);
+      setYAxisData(currentVisibleYAxis);
+    }
   };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -95,12 +109,14 @@ function BarGraph() {
 
       <View style={{ backgroundColor: 'white', paddingVertical: 10, borderRadius: 16, marginTop: 10 }}>
 
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, marginHorizontal: 16, marginVertical: 8, paddingVertical: 12, borderWidth: 0.4 }}>
-          <AnimatedText selectedValue={selectedValue} />
-          <Text style={{ fontSize: 20 }}>steps</Text>
-          <Text style={{ fontSize: 14 }}>average daily</Text>
+        <View style={{paddingHorizontal:16,paddingVertical:8,gap:4}}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+            <AnimatedText selectedValue={selectedValue} />
+            <Text style={{ fontSize: 20 }}>steps</Text>
+            <Text style={{ fontSize: 14,color: 'grey'  }}>average daily</Text>
+          </View>
+          <Text style={{ fontSize: 14, fontWeight: 500, color: 'grey' }}>{dateRange}</Text>
         </View>
-
         <View style={styles.chartRow}>
 
           <ScrollView
@@ -124,8 +140,8 @@ function BarGraph() {
                 <>
                   <Line
                     key={index}
-                    p1={{ x: 0, y: yScale(tick) + graphMargin/2 }} // Start of the line
-                    p2={{ x: graphWidth, y: yScale(tick) + graphMargin/2 }} // End of the line
+                    p1={{ x: 0, y: yScale(tick) + graphMargin / 2 }} // Start of the line
+                    p2={{ x: graphWidth, y: yScale(tick) + graphMargin / 2 }} // End of the line
                     color="gray" // Light gray for the grid lines
                     strokeWidth={0.3}
                   />
@@ -136,15 +152,16 @@ function BarGraph() {
                 <Group key={index}>
 
                   <XAxisText
-                    x={(graphWidth - x(dataPoint.label)!)} // here value is minus width becuase we need to scroll opposite direction
+                    x={(graphWidth - x(dataPoint.date)!)} // here value is minus width becuase we need to scroll opposite direction
                     y={canvasHeight}
-                    text={dataPoint.label}
+                    text={dataPoint.date}
                     index={index}
                     height={graphHeight}
                     graphMargin={graphMargin}
+                    barWidth={barWidth}
                   />
                   <BarPath
-                    x={graphWidth - x(dataPoint.label)!} // here value is minus width becuase we need to scroll opposite direction
+                    x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction
                     y={y(dataPoint.value)}
                     barWidth={barWidth}
                     barColor={'#7F82F5'}
@@ -159,7 +176,7 @@ function BarGraph() {
           </ScrollView>
 
           {/* Y Axis labels */}
-          <Canvas style={{ height: canvasHeight, width: yAxisWidth}}>
+          <Canvas style={{ height: canvasHeight, width: yAxisWidth }}>
             {yScale.ticks(4).map((tick, index) => (
               <YAxisText
                 key={index}
@@ -204,7 +221,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 6,
-    paddingVertical: 6
+    paddingBottom: 6
   },
 })
 

@@ -20,7 +20,7 @@ const BarPath = ({ x, y, barWidth, barColor, graphHeight, progress }: Props) => 
         }
         barPath.addRRect({
             rect: {
-                x: x! - barWidth / 2, //this  initial x point (to make it center we subtract half width of bar)
+                x: x! + barWidth / 2, //this  initial x point (to make it center we subtract half width of bar)
                 y: graphHeight+20, // this initial y point
                 width: barWidth,
                 height: y * -1 * progress.value, //inverted becuse 

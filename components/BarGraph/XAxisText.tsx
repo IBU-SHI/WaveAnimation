@@ -1,6 +1,6 @@
 import React from 'react'
 import { Platform, StyleSheet } from 'react-native'
-import { Text, matchFont,Line } from "@shopify/react-native-skia";
+import { Text, matchFont, Line } from "@shopify/react-native-skia";
 
 const fontFamily = Platform.select({ ios: "Helvetica", default: "serif" });
 const fontStyle = {
@@ -16,17 +16,18 @@ type Props = {
     text: string
     index: number
     height: number
-    graphMargin:number
+    graphMargin: number
+    barWidth: number
 }
-const XAxisText = ({ x, y, text,index,height,graphMargin }: Props) => {
+const XAxisText = ({ x, y, text, index, height, graphMargin, barWidth }: Props) => {
     const fontSize = font.measureText(text);
     return (
         <>
-            <Text x={x - fontSize.width / 2} y={y} color={'black'} text={text} font={font} />
+            <Text x={x + barWidth / 2 } y={y} color={'black'} text={text} font={font} />
             <Line
                 key={index}
-                p1={{ x: x!, y: graphMargin/2 }} // Start of the line
-                p2={{ x: x!, y: height + (graphMargin/2) }} // End of the line
+                p1={{ x: x! + 13, y: graphMargin / 2 }} // Start of the line
+                p2={{ x: x! + 13, y: height + (graphMargin / 2) }} // End of the line
                 color="gray" // Light gray for the grid lines
                 strokeWidth={0.3}
             />
