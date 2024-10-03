@@ -28,7 +28,7 @@ const XAxisText = ({ x, y, text, index, height, graphMargin, barWidth }: Props) 
                 p1={{ x: x! + 13, y: graphMargin / 2 }} // Start of the line
                 p2={{ x: x! + 13, y: height + (graphMargin / 2) }} // End of the line
                 color="gray" // Light gray for the grid lines
-                strokeWidth={2}
+                strokeWidth={0.5}
             />
         </>
     )

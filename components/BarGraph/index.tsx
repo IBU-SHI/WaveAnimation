@@ -91,7 +91,7 @@ function BarGraph() {
         start = start - 1
 
       }
-      setDateRange(data[end]?.date + '-' + data[start]?.date + ' Oct 2024')
+      setDateRange(data[end]?.date + '-' + data[start]?.date )
       const currentVisibleItems = data.slice(end, start + 1);
       setCurrentData(currentVisibleItems);
       const currentVisibleYAxis = data.slice(end, start + 2);
@@ -99,7 +99,7 @@ function BarGraph() {
     }
     else{
       const nodaysWeek=7
-      setDateRange(data[0]?.date + '-' + data[nodaysWeek-1]?.date + ' Oct 2024')
+      setDateRange(data[0]?.date + '-' + data[nodaysWeek-1]?.date )
       const currentVisibleItems = data.slice(0, nodaysWeek);
       setCurrentData(currentVisibleItems);
       const currentVisibleYAxis = data.slice(0, nodaysWeek+1);
@@ -168,7 +168,7 @@ function BarGraph() {
                     p1={{ x: 0, y: yScale(tick) + graphMargin / 2 }} // Start of the line
                     p2={{ x: graphWidth, y: yScale(tick) + graphMargin / 2 }} // End of the line
                     color="gray" // Light gray for the grid lines
-                    strokeWidth={2}
+                    strokeWidth={0.5}
                   />
                 </>
               ))}

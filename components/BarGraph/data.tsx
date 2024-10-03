@@ -6,37 +6,82 @@ export interface Data {
 }
 
 const data: Data[] = [
-  { label: 'Mon', day: 'Monday', date: '1', value: 5796 },  // Oct 1
-  { label: 'Tue', day: 'Tuesday', date: '2', value: 4036 }, // Oct 2
-  { label: 'Wed', day: 'Wednesday', date: '3', value: 4897 }, // Oct 3
-  { label: 'Thu', day: 'Thursday', date: '4', value: 5455 }, // Oct 4
-  { label: 'Fri', day: 'Friday', date: '5', value: 0 }, // Oct 5
-  { label: 'Sat', day: 'Saturday', date: '6', value: 2113 }, // Oct 6
-  { label: 'Sun', day: 'Sunday', date: '7', value: 1675 }, // Oct 7
-  { label: 'Mon', day: 'Monday', date: '8', value: 4000 },  // Oct 8
-  { label: 'Tue', day: 'Tuesday', date: '9', value: 5000 }, // Oct 9
-  { label: 'Wed', day: 'Wednesday', date: '10', value: 4500 }, // Oct 10
-  { label: 'Thu', day: 'Thursday', date: '11', value: 3000 }, // Oct 11
-  { label: 'Fri', day: 'Friday', date: '12', value: 6000 }, // Oct 12
-  { label: 'Sat', day: 'Saturday', date: '13', value: 3500 }, // Oct 13
-  { label: 'Sun', day: 'Sunday', date: '14', value: 2500 }, // Oct 14
-  { label: 'Mon', day: 'Monday', date: '15', value: 4800 },  // Oct 15
-  { label: 'Tue', day: 'Tuesday', date: '16', value: 5200 }, // Oct 16
-  { label: 'Wed', day: 'Wednesday', date: '17', value: 4900 }, // Oct 17
-  { label: 'Thu', day: 'Thursday', date: '18', value: 5500 }, // Oct 18
-  { label: 'Fri', day: 'Friday', date: '19', value: 7000 }, // Oct 19
-  { label: 'Sat', day: 'Saturday', date: '20', value: 4800 }, // Oct 20
-  { label: 'Sun', day: 'Sunday', date: '21', value: 5200 }, // Oct 21
-  { label: 'Mon', day: 'Monday', date: '22', value: 6000 },  // Oct 22
-  { label: 'Tue', day: 'Tuesday', date: '23', value: 4200 }, // Oct 23
-  { label: 'Wed', day: 'Wednesday', date: '24', value: 3500 }, // Oct 24
-  { label: 'Thu', day: 'Thursday', date: '25', value: 4000 }, // Oct 25
-  { label: 'Fri', day: 'Friday', date: '26', value: 6800 }, // Oct 26
-  { label: 'Sat', day: 'Saturday', date: '27', value: 7200 }, // Oct 27
-  { label: 'Sun', day: 'Sunday', date: '28', value: 6100 }, // Oct 28
-  { label: 'Mon', day: 'Monday', date: '29', value: 5700 },  // Oct 29
-  { label: 'Tue', day: 'Tuesday', date: '30', value: 6000 }, // Oct 30
-  { label: 'Wed', day: 'Wednesday', date: '31', value: 8000 }, // Oct 31
+  { label: 'Mon', day: 'Monday', date: '01/10/2024', value: 5796 },
+  { label: 'Tue', day: 'Tuesday', date: '02/10/2024', value: 4036 },
+  { label: 'Wed', day: 'Wednesday', date: '03/10/2024', value: 4897 },
+  { label: 'Thu', day: 'Thursday', date: '04/10/2024', value: 5455 },
+  { label: 'Fri', day: 'Friday', date: '05/10/2024', value: 0 },
+  { label: 'Sat', day: 'Saturday', date: '06/10/2024', value: 2113 },
+  { label: 'Sun', day: 'Sunday', date: '07/10/2024', value: 1675 },
+  { label: 'Mon', day: 'Monday', date: '08/10/2024', value: 4000 },
+  { label: 'Tue', day: 'Tuesday', date: '09/10/2024', value: 5000 },
+  { label: 'Wed', day: 'Wednesday', date: '10/10/2024', value: 4500 },
+  { label: 'Thu', day: 'Thursday', date: '11/10/2024', value: 3000 },
+  { label: 'Fri', day: 'Friday', date: '12/10/2024', value: 6000 },
+  { label: 'Sat', day: 'Saturday', date: '13/10/2024', value: 3500 },
+  { label: 'Sun', day: 'Sunday', date: '14/10/2024', value: 2500 },
+  { label: 'Mon', day: 'Monday', date: '15/10/2024', value: 4800 },
+  { label: 'Tue', day: 'Tuesday', date: '16/10/2024', value: 5200 },
+  { label: 'Wed', day: 'Wednesday', date: '17/10/2024', value: 4900 },
+  { label: 'Thu', day: 'Thursday', date: '18/10/2024', value: 5500 },
+  { label: 'Fri', day: 'Friday', date: '19/10/2024', value: 7000 },
+  { label: 'Sat', day: 'Saturday', date: '20/10/2024', value: 4800 },
+  { label: 'Sun', day: 'Sunday', date: '21/10/2024', value: 5200 },
+  { label: 'Mon', day: 'Monday', date: '22/10/2024', value: 6000 },
+  { label: 'Tue', day: 'Tuesday', date: '23/10/2024', value: 4200 },
+  { label: 'Wed', day: 'Wednesday', date: '24/10/2024', value: 3500 },
+  { label: 'Thu', day: 'Thursday', date: '25/10/2024', value: 4000 },
+  { label: 'Fri', day: 'Friday', date: '26/10/2024', value: 6800 },
+  { label: 'Sat', day: 'Saturday', date: '27/10/2024', value: 7200 },
+  { label: 'Sun', day: 'Sunday', date: '28/10/2024', value: 6100 },
+  { label: 'Mon', day: 'Monday', date: '29/10/2024', value: 5700 },
+  { label: 'Tue', day: 'Tuesday', date: '30/10/2024', value: 6000 },
+  { label: 'Wed', day: 'Wednesday', date: '31/10/2024', value: 8000 },
+  { label: 'Thu', day: 'Thursday', date: '01/11/2024', value: 5700 },
+  { label: 'Fri', day: 'Friday', date: '02/11/2024', value: 6000 },
+  { label: 'Sat', day: 'Saturday', date: '03/11/2024', value: 8000 },
+  { label: 'Sun', day: 'Sunday', date: '04/11/2024', value: 5500 },
+  { label: 'Mon', day: 'Monday', date: '05/11/2024', value: 6500 },
+  { label: 'Tue', day: 'Tuesday', date: '06/11/2024', value: 7200 },
+  { label: 'Wed', day: 'Wednesday', date: '07/11/2024', value: 5400 },
+  { label: 'Thu', day: 'Thursday', date: '08/11/2024', value: 4800 },
+  { label: 'Fri', day: 'Friday', date: '09/11/2024', value: 6100 },
+  { label: 'Sat', day: 'Saturday', date: '10/11/2024', value: 5500 },
+  { label: 'Sun', day: 'Sunday', date: '11/11/2024', value: 4700 },
+  { label: 'Mon', day: 'Monday', date: '12/11/2024', value: 6600 },
+  { label: 'Tue', day: 'Tuesday', date: '13/11/2024', value: 5300 },
+  { label: 'Wed', day: 'Wednesday', date: '14/11/2024', value: 6100 },
+  { label: 'Thu', day: 'Thursday', date: '15/11/2024', value: 5400 },
+  { label: 'Fri', day: 'Friday', date: '16/11/2024', value: 7000 },
+  { label: 'Sat', day: 'Saturday', date: '17/11/2024', value: 8000 },
+  { label: 'Sun', day: 'Sunday', date: '18/11/2024', value: 4900 },
+  { label: 'Mon', day: 'Monday', date: '19/11/2024', value: 6200 },
+  { label: 'Tue', day: 'Tuesday', date: '20/11/2024', value: 5300 },
+  { label: 'Wed', day: 'Wednesday', date: '21/11/2024', value: 6800 },
+  { label: 'Thu', day: 'Thursday', date: '22/11/2024', value: 5600 },
+  { label: 'Fri', day: 'Friday', date: '23/11/2024', value: 5900 },
+  { label: 'Sat', day: 'Saturday', date: '24/11/2024', value: 7100 },
+  { label: 'Sun', day: 'Sunday', date: '25/11/2024', value: 6000 },
+  { label: 'Mon', day: 'Monday', date: '26/11/2024', value: 6700 },
+  { label: 'Tue', day: 'Tuesday', date: '27/11/2024', value: 5400 },
+  { label: 'Wed', day: 'Wednesday', date: '28/11/2024', value: 6500 },
+  { label: 'Thu', day: 'Thursday', date: '29/11/2024', value: 7200 },
+  { label: 'Fri', day: 'Friday', date: '30/11/2024', value: 7800 },
+  { label: 'Sat', day: 'Saturday', date: '01/12/2024', value: 7000 },
+  { label: 'Sun', day: 'Sunday', date: '02/12/2024', value: 7500 },
+  { label: 'Mon', day: 'Monday', date: '03/12/2024', value: 6400 },
+  { label: 'Tue', day: 'Tuesday', date: '04/12/2024', value: 5200 },
+  { label: 'Wed', day: 'Wednesday', date: '05/12/2024', value: 6000 },
+  { label: 'Thu', day: 'Thursday', date: '06/12/2024', value: 6800 },
+  { label: 'Fri', day: 'Friday', date: '07/12/2024', value: 7400 },
+  { label: 'Sat', day: 'Saturday', date: '08/12/2024', value: 7100 },
+  { label: 'Sun', day: 'Sunday', date: '09/12/2024', value: 5500 },
+  { label: 'Mon', day: 'Monday', date: '10/12/2024', value: 6200 },
+  { label: 'Tue', day: 'Tuesday', date: '11/12/2024', value: 6000 },
+  { label: 'Wed', day: 'Wednesday', date: '12/12/2024', value: 5400 },
+  { label: 'Thu', day: 'Thursday', date: '13/12/2024', value: 4800 },
+  { label: 'Fri', day: 'Friday', date: '14/12/2024', value: 7000 },
+  { label: 'Sat', day: 'Saturday', date: '15/12/2024', value: 8000 },
 ];
 
 export { data };
