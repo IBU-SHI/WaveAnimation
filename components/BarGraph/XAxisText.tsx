@@ -5,7 +5,7 @@ import { Text, matchFont, Line } from "@shopify/react-native-skia";
 const fontFamily = Platform.select({ ios: "Helvetica", default: "serif" });
 const fontStyle = {
     fontFamily,
-    fontSize: 14,
+    fontSize: 10,
     fontStyle: "normal",
     fontWeight: "bold",
 };
@@ -20,7 +20,6 @@ type Props = {
     barWidth: number
 }
 const XAxisText = ({ x, y, text, index, height, graphMargin, barWidth }: Props) => {
-    const fontSize = font.measureText(text);
     return (
         <>
             <Text x={x + barWidth / 2 } y={y} color={'black'} text={text} font={font} />
@@ -29,7 +28,7 @@ const XAxisText = ({ x, y, text, index, height, graphMargin, barWidth }: Props) 
                 p1={{ x: x! + 13, y: graphMargin / 2 }} // Start of the line
                 p2={{ x: x! + 13, y: height + (graphMargin / 2) }} // End of the line
                 color="gray" // Light gray for the grid lines
-                strokeWidth={0.3}
+                strokeWidth={2}
             />
         </>
     )

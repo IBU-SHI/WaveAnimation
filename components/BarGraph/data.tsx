@@ -29,11 +29,11 @@ const data: Data[] = [
   { label: 'Sun', day: 'Sunday', date: '21', value: 5200 }, // Oct 21
   { label: 'Mon', day: 'Monday', date: '22', value: 6000 },  // Oct 22
   { label: 'Tue', day: 'Tuesday', date: '23', value: 4200 }, // Oct 23
-  { label: 'Wed', day: 'Wednesday', date: '24', value: 35 }, // Oct 24
-  { label: 'Thu', day: 'Thursday', date: '25', value: 40 }, // Oct 25
-  { label: 'Fri', day: 'Friday', date: '26', value: 68 }, // Oct 26
-  { label: 'Sat', day: 'Saturday', date: '27', value: 72 }, // Oct 27
-  { label: 'Sun', day: 'Sunday', date: '28', value: 61 }, // Oct 28
+  { label: 'Wed', day: 'Wednesday', date: '24', value: 3500 }, // Oct 24
+  { label: 'Thu', day: 'Thursday', date: '25', value: 4000 }, // Oct 25
+  { label: 'Fri', day: 'Friday', date: '26', value: 6800 }, // Oct 26
+  { label: 'Sat', day: 'Saturday', date: '27', value: 7200 }, // Oct 27
+  { label: 'Sun', day: 'Sunday', date: '28', value: 6100 }, // Oct 28
   { label: 'Mon', day: 'Monday', date: '29', value: 5700 },  // Oct 29
   { label: 'Tue', day: 'Tuesday', date: '30', value: 6000 }, // Oct 30
   { label: 'Wed', day: 'Wednesday', date: '31', value: 8000 }, // Oct 31

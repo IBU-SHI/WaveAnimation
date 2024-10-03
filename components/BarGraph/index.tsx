@@ -97,6 +97,30 @@ function BarGraph() {
       const currentVisibleYAxis = data.slice(end, start + 2);
       setYAxisData(currentVisibleYAxis);
     }
+    else{
+      const nodaysWeek=7
+      setDateRange(data[0]?.date + '-' + data[nodaysWeek-1]?.date + ' Oct 2024')
+      const currentVisibleItems = data.slice(0, nodaysWeek);
+      setCurrentData(currentVisibleItems);
+      const currentVisibleYAxis = data.slice(0, nodaysWeek+1);
+      setYAxisData(currentVisibleYAxis);
+    }
+  };
+
+  const handleSnapToBar = (event: any) => {
+    const currentPosition = event.nativeEvent.contentOffset.x; // Current scroll position
+    const barSpacingWithBarWidth = barWidth + barSpacing; // Total width of one bar with its spacing
+  
+    // Calculate which bar is closest based on the current scroll position
+    const nearestBarIndex = Math.round(currentPosition / barSpacingWithBarWidth);
+  
+    // Scroll to the nearest bar
+    const snapToPosition = nearestBarIndex * barSpacingWithBarWidth;
+  
+    scrollRef.current?.scrollTo({
+      x: snapToPosition,
+      animated: true,
+    });
   };
 
 
@@ -129,6 +153,7 @@ function BarGraph() {
             contentContainerStyle={{
               flexDirection: 'row-reverse',
             }}
+            onMomentumScrollEnd={(event) => handleSnapToBar(event)}
           >
             <Canvas
               style={{
@@ -143,7 +168,7 @@ function BarGraph() {
                     p1={{ x: 0, y: yScale(tick) + graphMargin / 2 }} // Start of the line
                     p2={{ x: graphWidth, y: yScale(tick) + graphMargin / 2 }} // End of the line
                     color="gray" // Light gray for the grid lines
-                    strokeWidth={0.3}
+                    strokeWidth={2}
                   />
                 </>
               ))}
@@ -154,7 +179,7 @@ function BarGraph() {
                   <XAxisText
                     x={(graphWidth - x(dataPoint.date)!)} // here value is minus width becuase we need to scroll opposite direction
                     y={canvasHeight}
-                    text={dataPoint.date}
+                    text={dataPoint.label}
                     index={index}
                     height={graphHeight}
                     graphMargin={graphMargin}
