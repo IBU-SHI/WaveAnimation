@@ -1,13 +1,13 @@
 import React from 'react'
 import { Platform, StyleSheet } from 'react-native'
-import { Canvas, Text, matchFont, Fill, Skia, Line } from "@shopify/react-native-skia";
+import { Text, matchFont, Line } from "@shopify/react-native-skia";
 
 const fontFamily = Platform.select({ ios: "Helvetica", default: "serif" });
 const fontStyle = {
     fontFamily,
-    fontSize: 12,
+    fontSize: 10,
     fontStyle: "normal",
-    fontWeight: "bold",
+    fontWeight: 500,
 };
 const font = matchFont(fontStyle);
 type Props = {
@@ -16,20 +16,21 @@ type Props = {
     text: string
     index: number
     width: number
-    barSpacing:number
-    graphMargin:number
+    barSpacing: number
+    graphMargin: number
+    grid: boolean
 }
-const YAxisText = ({ x, y, text, index, width ,barSpacing,graphMargin}: Props) => {
+const YAxisText = ({ x, y, text, index, width, barSpacing, graphMargin, grid=true }: Props) => {
     return (
         <>
-            <Text x={x} y={y + 20} color={'black'} text={text} font={font} />
-            <Line
+            <Text x={x} y={y + 20} color={'#626C77'} text={text} font={font} />
+            {grid && <Line
                 key={index}
-                p1={{ x: 0 , y: y + (graphMargin/2)}} // Start of the line
-                p2={{ x: width-barSpacing, y: y + (graphMargin/2) }} // End of the line
+                p1={{ x: 0, y: y + (graphMargin / 2) }} // Start of the line
+                p2={{ x: width - barSpacing, y: y + (graphMargin / 2) }} // End of the line
                 color="gray" // Light gray for the grid lines
                 strokeWidth={0.3}
-            />
+            />}
         </>
 
     )

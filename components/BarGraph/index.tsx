@@ -1,13 +1,13 @@
-import { Canvas, Group, Line } from '@shopify/react-native-skia';
 import React, { useEffect, useRef, useState } from 'react'
-import { StyleSheet, View, Text, SafeAreaView, ScrollView } from 'react-native'
-import { data, Data } from './data';
+import { Canvas, Group, Line } from '@shopify/react-native-skia';
+import { StyleSheet, View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
+import { hourData, weekData, Data } from './data';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import { Dimensions } from 'react-native';
 import * as d3 from 'd3';
 import BarPath from './BarPath';
 import XAxisText from './XAxisText';
-import AnimatedText from './AnimatedText';
+import AnimatedText from './Legend';
 import YAxisText from './YAxisText';
 
 const width = Dimensions.get('window').width; // this is width of screen
@@ -15,9 +15,13 @@ const height = Dimensions.get('window').height; // this is width of screen
 
 function BarGraph() {
 
+  const [data, setData] = useState(hourData)
+  const [noBarTab, setNoBarTab] = useState(24) // it is for no of hour,days,week,month as per tab value
+  const [barWidth, setBarWidth] = useState(8) // width of bar and it will be dynamic in future
   const [currentData, setCurrentData] = useState(data.slice(0, 7)) //current week data ....more testing need
   const [yAxisData, setYAxisData] = useState(data.slice(0, 8)) //current week data ....more testing need
-  const [dateRange, setDateRange] = useState('1-7 Oct 2024')
+  const [dateRange, setDateRange] = useState('')
+  const [selectTab, setSelectTab] = useState('D')
 
   const progess = useSharedValue<number>(0); // this is progress value use for animation
   const selectedValue = useSharedValue<number>(0); // this is selected value (for tool tip purpose in future)
@@ -26,8 +30,10 @@ function BarGraph() {
   const canvasHeight = (height / 3); //this is height of canvas (height of container/paper where graph can be drawn) it can be customize
   const canvasWidth = width; //this is width of canvas (width of container/paper where graph can be drawn)
 
-  const barWidth = 26 // width of bar and it will be dynamic in future
+  const xAxisGrid = false
+  const yAxisGrid = false
   const yAxisWidth = 30
+
   const graphWidth = barWidth * data.length * 2 - yAxisWidth;//this is width of graph
   const graphMargin = 40  //this is bottom margin of graph
   const graphHeight = canvasHeight - graphMargin  //this is heigt of graph
@@ -75,15 +81,16 @@ function BarGraph() {
 
     const contentWidth = event.nativeEvent.contentSize.width; // Total width of the scrollable content
     const layoutWidth = event.nativeEvent.layoutMeasurement.width; // Width of the visible area
+    const barSpacingWithBarWidth = barWidth + barSpacing; // Total width of one bar with its spacing
 
     // Calculate the maximum scrollable position (max scroll)
     const maxScroll = contentWidth - layoutWidth;
     if (currentPosition < maxScroll) {
       // Calculate the visible start and end indices
-      var start = data.length - Math.floor(currentPosition / (barWidth + barSpacing)); // Starting bar based on scroll
+      var start = data.length - Math.floor(currentPosition / (barSpacingWithBarWidth)); // Starting bar based on scroll
       var end = data.length - Math.ceil((currentPosition +
-        event.nativeEvent.layoutMeasurement.width - ((barWidth + (barSpacing * 1.5)))) / (barWidth + barSpacing)); // Ending bar based on scroll + visible width
-      if (start > 0 && end < data.length - 6) {
+        event.nativeEvent.layoutMeasurement.width - ((barWidth + (barSpacing * 1.5)))) / (barSpacingWithBarWidth)); // Ending bar based on scroll + visible width
+      if (start > 0 && end < data.length - noBarTab - 1) {
         start = start - 2
         end = end - 1
       }
@@ -91,18 +98,18 @@ function BarGraph() {
         start = start - 1
 
       }
-      setDateRange(data[end]?.date + '-' + data[start]?.date )
+      setDateRange(data[end]?.date + ' - ' + data[start]?.date)
       const currentVisibleItems = data.slice(end, start + 1);
       setCurrentData(currentVisibleItems);
       const currentVisibleYAxis = data.slice(end, start + 2);
       setYAxisData(currentVisibleYAxis);
     }
-    else{
-      const nodaysWeek=7
-      setDateRange(data[0]?.date + '-' + data[nodaysWeek-1]?.date )
-      const currentVisibleItems = data.slice(0, nodaysWeek);
+    else {
+
+      setDateRange(data[0]?.date + ' - ' + data[noBarTab - 1]?.date)
+      const currentVisibleItems = data.slice(0, noBarTab);
       setCurrentData(currentVisibleItems);
-      const currentVisibleYAxis = data.slice(0, nodaysWeek+1);
+      const currentVisibleYAxis = data.slice(0, noBarTab + 1);
       setYAxisData(currentVisibleYAxis);
     }
   };
@@ -110,19 +117,61 @@ function BarGraph() {
   const handleSnapToBar = (event: any) => {
     const currentPosition = event.nativeEvent.contentOffset.x; // Current scroll position
     const barSpacingWithBarWidth = barWidth + barSpacing; // Total width of one bar with its spacing
-  
+
     // Calculate which bar is closest based on the current scroll position
     const nearestBarIndex = Math.round(currentPosition / barSpacingWithBarWidth);
-  
+
     // Scroll to the nearest bar
     const snapToPosition = nearestBarIndex * barSpacingWithBarWidth;
-  
+
     scrollRef.current?.scrollTo({
       x: snapToPosition,
       animated: true,
     });
   };
 
+  const tab = (
+    <View style={styles.tabWrapper}>
+
+      <TouchableOpacity style={[styles.tab, selectTab === 'D' && styles.selectTab]}
+        onPress={() => { setSelectTab('D') }}>
+        <Text style={styles.tabText}>D</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={[styles.tab, selectTab === 'W' && styles.selectTab]}
+        onPress={() => { setSelectTab('W') }}><Text style={styles.tabText}>W</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={[styles.tab, selectTab === 'M' && styles.selectTab]}
+        onPress={() => { setSelectTab('M') }}>
+        <Text style={styles.tabText}>M</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={[styles.tab, selectTab === '6M' && styles.selectTab]}
+        onPress={() => { setSelectTab('6M') }}>
+        <Text style={styles.tabText}>6M</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={[styles.tab, selectTab === 'Y' && styles.selectTab]}
+        onPress={() => { setSelectTab('Y') }}>
+        <Text style={styles.tabText}>Y</Text>
+      </TouchableOpacity>
+
+    </View>
+  )
+
+  useEffect(() => {
+    if (selectTab === 'D') {
+      setData(hourData)
+      setNoBarTab(24) // 24 hour per day
+      setBarWidth(8)
+    }
+    else {
+      setData(weekData)
+      setNoBarTab(7) // 7 days per week
+      setBarWidth(26)
+    }
+  }, [selectTab])
 
   return (
     <SafeAreaView style={styles.container}>
@@ -133,14 +182,10 @@ function BarGraph() {
 
       <View style={{ backgroundColor: 'white', paddingVertical: 10, borderRadius: 16, marginTop: 10 }}>
 
-        <View style={{paddingHorizontal:16,paddingVertical:8,gap:4}}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-            <AnimatedText selectedValue={selectedValue} />
-            <Text style={{ fontSize: 20 }}>steps</Text>
-            <Text style={{ fontSize: 14,color: 'grey'  }}>average daily</Text>
-          </View>
-          <Text style={{ fontSize: 14, fontWeight: 500, color: 'grey' }}>{dateRange}</Text>
-        </View>
+        <AnimatedText selectedValue={selectedValue} duration={dateRange} />
+
+        {tab}
+
         <View style={styles.chartRow}>
 
           <ScrollView
@@ -161,7 +206,7 @@ function BarGraph() {
                 width: graphWidth,
               }}
             >
-              {yScale.ticks(4).map((tick, index) => (
+              {yAxisGrid && yScale.ticks(4).map((tick, index) => (
                 <>
                   <Line
                     key={index}
@@ -174,7 +219,7 @@ function BarGraph() {
               ))}
 
               {data.map((dataPoint: Data, index) => (
-                <Group key={index}>
+                <Group key={x(dataPoint.date)}>
 
                   <XAxisText
                     x={(graphWidth - x(dataPoint.date)!)} // here value is minus width becuase we need to scroll opposite direction
@@ -184,6 +229,7 @@ function BarGraph() {
                     height={graphHeight}
                     graphMargin={graphMargin}
                     barWidth={barWidth}
+                    grid={xAxisGrid}
                   />
                   <BarPath
                     x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction
@@ -212,6 +258,7 @@ function BarGraph() {
                 width={yAxisWidth}
                 barSpacing={barSpacing}
                 graphMargin={graphMargin}
+                grid={yAxisGrid}
               />
             ))}
           </Canvas>
@@ -245,9 +292,46 @@ const styles = StyleSheet.create({
   chartRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 6,
     paddingBottom: 6
   },
+  tabWrapper: {
+    flexDirection: 'row',
+    marginHorizontal: 16,
+    padding: 2,
+    gap: 4,
+    borderRadius: 9,
+    backgroundColor: '#7878801F',
+    marginVertical: 12
+  },
+  tab: {
+    borderRightWidth: 0.5,
+    borderColor: '#8E8E93',
+    flex: 1,
+    paddingVertical: 2
+  },
+  selectTab: {
+    borderWidth: 1,
+    borderColor: 'white',
+    borderRadius: 7,
+    backgroundColor: 'white',
+    flex: 1,
+    shadowColor: 'grey',
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 1,
+    elevation: 5,
+  },
+  tabText: {
+    fontSize: 13,
+    fontWeight: 500,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    textAlign: 'center'
+  }
+
+
 })
 
 export default BarGraph

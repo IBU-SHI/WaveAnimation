@@ -7,7 +7,7 @@ const fontStyle = {
     fontFamily,
     fontSize: 10,
     fontStyle: "normal",
-    fontWeight: "bold",
+    fontWeight: 500,
 };
 const font = matchFont(fontStyle);
 type Props = {
@@ -18,18 +18,20 @@ type Props = {
     height: number
     graphMargin: number
     barWidth: number
+    grid: boolean
 }
-const XAxisText = ({ x, y, text, index, height, graphMargin, barWidth }: Props) => {
+const XAxisText = ({ x, y, text, index, height, graphMargin, barWidth, grid }: Props) => {
     return (
         <>
-            <Text x={x + barWidth / 2 } y={y} color={'black'} text={text} font={font} />
-            <Line
+            <Text x={x + barWidth / 2} y={y} color={'#626C77'} text={text} font={font} />
+            {grid && <Line
                 key={index}
                 p1={{ x: x! + 13, y: graphMargin / 2 }} // Start of the line
                 p2={{ x: x! + 13, y: height + (graphMargin / 2) }} // End of the line
                 color="gray" // Light gray for the grid lines
                 strokeWidth={0.5}
             />
+            }
         </>
     )
 }
