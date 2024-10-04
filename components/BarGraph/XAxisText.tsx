@@ -23,7 +23,7 @@ type Props = {
 const XAxisText = ({ x, y, text, index, height, graphMargin, barWidth, grid }: Props) => {
     return (
         <>
-            <Text x={x + barWidth / 2} y={y} color={'#626C77'} text={text} font={font} />
+            <Text x={x + barWidth / 2} y={y-2} color={'#626C77'} text={text} font={font} />
             {grid && <Line
                 key={index}
                 p1={{ x: x! + 13, y: graphMargin / 2 }} // Start of the line

@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Canvas, Group, Line } from '@shopify/react-native-skia';
 import { StyleSheet, View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
-import { hourData, weekData, Data } from './data';
+import { hourData, weekData, monthData, Data, sixMonthData, yearData } from './data';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import { Dimensions } from 'react-native';
 import * as d3 from 'd3';
 import BarPath from './BarPath';
 import XAxisText from './XAxisText';
-import AnimatedText from './Legend';
+import Legend from './Legend';
 import YAxisText from './YAxisText';
 
 const width = Dimensions.get('window').width; // this is width of screen
@@ -18,16 +18,18 @@ function BarGraph() {
   const [data, setData] = useState(hourData)
   const [noBarTab, setNoBarTab] = useState(24) // it is for no of hour,days,week,month as per tab value
   const [barWidth, setBarWidth] = useState(8) // width of bar and it will be dynamic in future
-  const [currentData, setCurrentData] = useState(data.slice(0, 7)) //current week data ....more testing need
-  const [yAxisData, setYAxisData] = useState(data.slice(0, 8)) //current week data ....more testing need
-  const [dateRange, setDateRange] = useState('')
+  const [currentData, setCurrentData] = useState(data.slice(0, 24)) //current week data ....more testing need
+  const [yAxisData, setYAxisData] = useState(data.slice(0, 25)) //current week data ....more testing need
+  const [startDuration, setStartDuration] = useState('')
+  const [endDuration, setEndDuration] = useState('')
   const [selectTab, setSelectTab] = useState('D')
 
   const progess = useSharedValue<number>(0); // this is progress value use for animation
   const selectedValue = useSharedValue<number>(0); // this is selected value (for tool tip purpose in future)
   const totalValue = currentData.reduce((acc, cur) => acc + cur.value, 0) // this will get total value of steps (we need avg steps in future)
+  const averageValue = totalValue / currentData.length; //average value of current visible data
 
-  const canvasHeight = (height / 3); //this is height of canvas (height of container/paper where graph can be drawn) it can be customize
+  const canvasHeight = height / 3; //this is height of canvas (height of container/paper where graph can be drawn) it can be customize
   const canvasWidth = width; //this is width of canvas (width of container/paper where graph can be drawn)
 
   const xAxisGrid = false
@@ -64,8 +66,8 @@ function BarGraph() {
 
   useEffect(() => {
     progess.value = withTiming(1, { duration: 1000 })
-    selectedValue.value = withTiming(totalValue, { duration: 1000 }) // here if we change duration to 1000 than animation will show ..at current condition no
-  }, [progess, selectedValue, totalValue])
+    selectedValue.value = withTiming(averageValue, { duration: 1000 }) // here if we change duration to 1000 than animation will show ..at current condition no
+  }, [progess, selectedValue, averageValue])
 
 
   const scrollRef = useRef<ScrollView>(null); // this scroll view ref of horizontal graph
@@ -98,36 +100,26 @@ function BarGraph() {
         start = start - 1
 
       }
-      setDateRange(data[end]?.date + ' - ' + data[start]?.date)
+      setStartDuration(data[end]?.date)
+      setEndDuration(data[start]?.date)
       const currentVisibleItems = data.slice(end, start + 1);
       setCurrentData(currentVisibleItems);
-      const currentVisibleYAxis = data.slice(end, start + 2);
-      setYAxisData(currentVisibleYAxis);
+      const totalValue = currentVisibleItems.reduce((acc, cur) => acc + cur.value, 0) // this will get total value of steps (we need avg steps in future)
+      const averageValue = totalValue / currentVisibleItems.length;
+      if (averageValue > 0) {
+        const currentVisibleYAxis = data.slice(end, start + 2);
+        setYAxisData(currentVisibleYAxis);
+      }
     }
     else {
 
-      setDateRange(data[0]?.date + ' - ' + data[noBarTab - 1]?.date)
+      setStartDuration(data[0]?.date)
+      setEndDuration(data[noBarTab - 1]?.date)
       const currentVisibleItems = data.slice(0, noBarTab);
       setCurrentData(currentVisibleItems);
       const currentVisibleYAxis = data.slice(0, noBarTab + 1);
       setYAxisData(currentVisibleYAxis);
     }
-  };
-
-  const handleSnapToBar = (event: any) => {
-    const currentPosition = event.nativeEvent.contentOffset.x; // Current scroll position
-    const barSpacingWithBarWidth = barWidth + barSpacing; // Total width of one bar with its spacing
-
-    // Calculate which bar is closest based on the current scroll position
-    const nearestBarIndex = Math.round(currentPosition / barSpacingWithBarWidth);
-
-    // Scroll to the nearest bar
-    const snapToPosition = nearestBarIndex * barSpacingWithBarWidth;
-
-    scrollRef.current?.scrollTo({
-      x: snapToPosition,
-      animated: true,
-    });
   };
 
   const tab = (
@@ -159,19 +151,25 @@ function BarGraph() {
 
     </View>
   )
-
+  interface TabSettings {
+    data: Data[];  // Adjust the type based on your actual data type
+    noBarTab: number;
+    barWidth: number;
+  }
   useEffect(() => {
-    if (selectTab === 'D') {
-      setData(hourData)
-      setNoBarTab(24) // 24 hour per day
-      setBarWidth(8)
-    }
-    else {
-      setData(weekData)
-      setNoBarTab(7) // 7 days per week
-      setBarWidth(26)
-    }
-  }, [selectTab])
+    const tabSettings: Record<string, TabSettings> = {
+      'D': { data: hourData, noBarTab: 24, barWidth: 8 },
+      'W': { data: weekData, noBarTab: 7, barWidth: 25 },
+      'M': { data: monthData, noBarTab: 30, barWidth: 6 },
+      '6M': { data: sixMonthData, noBarTab: 24, barWidth: 8 },
+      'Y': { data: yearData, noBarTab: 7, barWidth: 16 }
+    };
+
+    const { data, noBarTab, barWidth } = tabSettings[selectTab] || tabSettings['D'];
+    setData(data);
+    setNoBarTab(noBarTab);
+    setBarWidth(barWidth);
+  }, [selectTab]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -180,13 +178,13 @@ function BarGraph() {
         <Text style={styles.sectionText}>Using Skia,D3 and Reanimated</Text>
       </View>
 
-      <View style={{ backgroundColor: 'white', paddingVertical: 10, borderRadius: 16, marginTop: 10 }}>
+      <View style={styles.chartContainer}>
 
-        <AnimatedText selectedValue={selectedValue} duration={dateRange} />
+        <Legend selectedValue={selectedValue} startDuration={startDuration} endDuration={endDuration} />
 
         {tab}
 
-        <View style={styles.chartRow}>
+        <View style={styles.chart}>
 
           <ScrollView
             horizontal
@@ -198,7 +196,6 @@ function BarGraph() {
             contentContainerStyle={{
               flexDirection: 'row-reverse',
             }}
-            onMomentumScrollEnd={(event) => handleSnapToBar(event)}
           >
             <Canvas
               style={{
@@ -272,8 +269,14 @@ function BarGraph() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ebecde',
+    backgroundColor: '#F2F3F7',
     marginHorizontal: 8
+  },
+  chartContainer: {
+    backgroundColor: 'white',
+    paddingVertical: 10,
+    borderRadius: 40,
+    marginTop: 10
   },
   sectionTitleContainer: {
     marginTop: 24,
@@ -289,12 +292,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'black',
   },
-  chartRow: {
+  chart: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 6,
-    paddingBottom: 6
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   tabWrapper: {
     flexDirection: 'row',
@@ -303,12 +306,11 @@ const styles = StyleSheet.create({
     gap: 4,
     borderRadius: 9,
     backgroundColor: '#7878801F',
-    borderWidth:0.5,
-    borderColor:'#7878801F',
+    borderWidth: 0.5,
+    borderColor: '#7878801F',
     marginVertical: 12
   },
   tab: {
-   // borderRightWidth: 0.5,
     borderColor: '#8E8E93',
     flex: 1,
     paddingVertical: 2
@@ -332,8 +334,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     textAlign: 'center'
   }
-
-
 })
 
 export default BarGraph
