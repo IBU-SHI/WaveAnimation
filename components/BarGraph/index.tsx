@@ -10,8 +10,8 @@ import XAxisText from './XAxisText';
 import Legend from './Legend';
 import YAxisText from './YAxisText';
 
-const width = Dimensions.get('window').width; // this is width of screen
-const height = Dimensions.get('window').height; // this is width of screen
+const { width, height } = Dimensions.get('window');
+const tabs = ['D', 'W', 'M', '6M', 'Y'];// global constant
 
 function BarGraph() {
 
@@ -122,35 +122,19 @@ function BarGraph() {
     }
   };
 
-  const tab = (
+  const Tab = (
     <View style={styles.tabWrapper}>
-
-      <TouchableOpacity style={[styles.tab, selectTab === 'D' && styles.selectTab]}
-        onPress={() => { setSelectTab('D') }}>
-        <Text style={styles.tabText}>D</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[styles.tab, selectTab === 'W' && styles.selectTab]}
-        onPress={() => { setSelectTab('W') }}><Text style={styles.tabText}>W</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[styles.tab, selectTab === 'M' && styles.selectTab]}
-        onPress={() => { setSelectTab('M') }}>
-        <Text style={styles.tabText}>M</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[styles.tab, selectTab === '6M' && styles.selectTab]}
-        onPress={() => { setSelectTab('6M') }}>
-        <Text style={styles.tabText}>6M</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[styles.tab, selectTab === 'Y' && styles.selectTab]}
-        onPress={() => { setSelectTab('Y') }}>
-        <Text style={styles.tabText}>Y</Text>
-      </TouchableOpacity>
-
+      {tabs.map((tabOption) => (
+        <TouchableOpacity
+          key={tabOption}
+          style={[styles.tab, selectTab === tabOption && styles.selectTab]}
+          onPress={() => setSelectTab(tabOption)}
+        >
+          <Text style={styles.tabText}>{tabOption}</Text>
+        </TouchableOpacity>
+      ))}
     </View>
-  )
+  );
   interface TabSettings {
     data: Data[];  // Adjust the type based on your actual data type
     noBarTab: number;
@@ -182,7 +166,7 @@ function BarGraph() {
 
         <Legend selectedValue={selectedValue} startDuration={startDuration} endDuration={endDuration} />
 
-        {tab}
+        {Tab}
 
         <View style={styles.chart}>
 
@@ -191,7 +175,7 @@ function BarGraph() {
             ref={scrollRef}
             onScroll={onScroll}
             showsHorizontalScrollIndicator={false}
-            scrollEnabled={data.length > 7 ? true : false}
+            scrollEnabled={data.length > noBarTab ? true : false}
             onContentSizeChange={scrollToEnd}
             contentContainerStyle={{
               flexDirection: 'row-reverse',
@@ -204,15 +188,13 @@ function BarGraph() {
               }}
             >
               {yAxisGrid && yScale.ticks(4).map((tick, index) => (
-                <>
-                  <Line
-                    key={index}
-                    p1={{ x: 0, y: yScale(tick) + graphMargin / 2 }} // Start of the line
-                    p2={{ x: graphWidth, y: yScale(tick) + graphMargin / 2 }} // End of the line
-                    color="gray" // Light gray for the grid lines
-                    strokeWidth={0.5}
-                  />
-                </>
+                <Line
+                  key={index}
+                  p1={{ x: 0, y: yScale(tick) + graphMargin / 2 }} // Start of the line
+                  p2={{ x: graphWidth, y: yScale(tick) + graphMargin / 2 }} // End of the line
+                  color="gray" // Light gray for the grid lines
+                  strokeWidth={0.5}
+                />
               ))}
 
               {data.map((dataPoint: Data, index) => (
@@ -243,7 +225,6 @@ function BarGraph() {
             </Canvas>
           </ScrollView>
 
-          {/* Y Axis labels */}
           <Canvas style={{ height: canvasHeight, width: yAxisWidth }}>
             {yScale.ticks(4).map((tick, index) => (
               <YAxisText
