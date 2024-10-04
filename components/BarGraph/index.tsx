@@ -303,10 +303,12 @@ const styles = StyleSheet.create({
     gap: 4,
     borderRadius: 9,
     backgroundColor: '#7878801F',
+    borderWidth:0.5,
+    borderColor:'#7878801F',
     marginVertical: 12
   },
   tab: {
-    borderRightWidth: 0.5,
+   // borderRightWidth: 0.5,
     borderColor: '#8E8E93',
     flex: 1,
     paddingVertical: 2
