@@ -26,6 +26,11 @@ import Graph from './Graph';
 import Segment from './Segment';
 
 const { width, height } = Dimensions.get('window');
+interface TabSettings {
+  data: Data[]; // Adjust the type based on your actual data type
+  noBarTab: number;
+  barWidth: number;
+}
 
 function BarGraph() {
   const [data, setData] = useState(hourData);
@@ -36,6 +41,8 @@ function BarGraph() {
   const [startDuration, setStartDuration] = useState('');
   const [endDuration, setEndDuration] = useState('');
   const [selectTab, setSelectTab] = useState('D');
+
+  const scrollRef = useRef<ScrollView>(null); // this scroll view ref of horizontal graph
 
   const progess = useSharedValue<number>(0); // this is progress value use for animation
   const selectedValue = useSharedValue<number>(0); // this is selected value (for tool tip purpose in future)
@@ -48,7 +55,6 @@ function BarGraph() {
   const canvasHeight = height / 3; //this is height of canvas (height of container/paper where graph can be drawn) it can be customize
   const canvasWidth = width; //this is width of canvas (width of container/paper where graph can be drawn)
 
-  const yAxisGrid = false;
   const yAxisWidth = 30;
 
   const graphWidth = barWidth * data.length * 2 - yAxisWidth; //this is width of graph
@@ -85,7 +91,21 @@ function BarGraph() {
     selectedValue.value = withTiming(averageValue, { duration: 1000 }); // here if we change duration to 1000 than animation will show ..at current condition no
   }, [progess, selectedValue, averageValue]);
 
-  const scrollRef = useRef<ScrollView>(null); // this scroll view ref of horizontal graph
+  useEffect(() => {
+    const tabSettings: Record<string, TabSettings> = {
+      D: { data: hourData, noBarTab: 24, barWidth: 8 },
+      W: { data: weekData, noBarTab: 7, barWidth: 25 },
+      M: { data: monthData, noBarTab: 30, barWidth: 6 },
+      '6M': { data: sixMonthData, noBarTab: 24, barWidth: 8 },
+      Y: { data: yearData, noBarTab: 7, barWidth: 16 },
+    };
+
+    const { data, noBarTab, barWidth } =
+      tabSettings[selectTab] || tabSettings['D'];
+    setData(data);
+    setNoBarTab(noBarTab);
+    setBarWidth(barWidth);
+  }, [selectTab]);
 
   const scrollToEnd = () => {
     if (scrollRef.current) {
@@ -142,27 +162,6 @@ function BarGraph() {
       setYAxisData(currentVisibleYAxis);
     }
   };
-  interface TabSettings {
-    data: Data[]; // Adjust the type based on your actual data type
-    noBarTab: number;
-    barWidth: number;
-  }
-
-  useEffect(() => {
-    const tabSettings: Record<string, TabSettings> = {
-      D: { data: hourData, noBarTab: 24, barWidth: 8 },
-      W: { data: weekData, noBarTab: 7, barWidth: 25 },
-      M: { data: monthData, noBarTab: 30, barWidth: 6 },
-      '6M': { data: sixMonthData, noBarTab: 24, barWidth: 8 },
-      Y: { data: yearData, noBarTab: 7, barWidth: 16 },
-    };
-
-    const { data, noBarTab, barWidth } =
-      tabSettings[selectTab] || tabSettings['D'];
-    setData(data);
-    setNoBarTab(noBarTab);
-    setBarWidth(barWidth);
-  }, [selectTab]);
 
   const touchHandler = (e: GestureResponderEvent) => {
     const touchX = e.nativeEvent.locationX;
@@ -184,6 +183,7 @@ function BarGraph() {
       }
     }
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.sectionTitleContainer}>
@@ -219,6 +219,9 @@ function BarGraph() {
                   canvasHeight={canvasHeight}
                   progress={progess}
                   data={hourData}
+                  xGrid={false}
+                  yGrid={false}
+                  minBarValue={10}
                 />
               )
             }
@@ -229,6 +232,9 @@ function BarGraph() {
                   canvasHeight={canvasHeight}
                   progress={progess}
                   data={weekData}
+                  xGrid={false}
+                  yGrid={false}
+                  minBarValue={10}
                 />
               )
             }
@@ -239,6 +245,9 @@ function BarGraph() {
                   canvasHeight={canvasHeight}
                   progress={progess}
                   data={monthData}
+                  xGrid={false}
+                  yGrid={false}
+                  minBarValue={10}
                 />
               )
             }
@@ -249,6 +258,9 @@ function BarGraph() {
                   canvasHeight={canvasHeight}
                   progress={progess}
                   data={sixMonthData}
+                  xGrid={false}
+                  yGrid={false}
+                  minBarValue={10}
                 />
               )
             }
@@ -259,6 +271,9 @@ function BarGraph() {
                   canvasHeight={canvasHeight}
                   progress={progess}
                   data={yearData}
+                  xGrid={false}
+                  yGrid={false}
+                  minBarValue={10}
                 />
               )
             }
@@ -275,7 +290,7 @@ function BarGraph() {
                 width={yAxisWidth}
                 barSpacing={barSpacing}
                 graphMargin={graphMargin}
-                grid={yAxisGrid}
+                grid={false}
               />
             ))}
           </Canvas>
@@ -297,7 +312,6 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     marginTop: 10,
   },
-
   chart: {
     flexDirection: 'row',
     alignItems: 'center',

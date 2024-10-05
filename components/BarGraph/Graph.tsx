@@ -11,12 +11,13 @@ type Props = {
     canvasHeight: number
     progress: SharedValue<number>
     data: any
+    xGrid: boolean
+    yGrid: boolean
+    minBarValue?: number
 }
 
-const Graph = ({ barWidth, canvasHeight, progress, data }: Props) => {
+const Graph = ({ barWidth, canvasHeight, progress, data, xGrid = true, yGrid = true, minBarValue = 0 }: Props) => {
 
-    const xAxisGrid = false;
-    const yAxisGrid = false;
     const yAxisWidth = 30;
 
     const graphWidth = barWidth * data.length * 2 - yAxisWidth; //this is width of graph
@@ -43,9 +44,9 @@ const Graph = ({ barWidth, canvasHeight, progress, data }: Props) => {
         .range([graphHeight, 0]);
     return (
 
-        <Animated.View 
-        entering={FadeIn.duration(700).easing(Easing.ease)}
-        exiting={FadeOut} >
+        <Animated.View
+            entering={FadeIn.duration(700).easing(Easing.ease)}
+            exiting={FadeOut} >
             <Canvas
                 style={{
                     height: canvasHeight,
@@ -53,7 +54,7 @@ const Graph = ({ barWidth, canvasHeight, progress, data }: Props) => {
                 }}
             // onTouchStart={touchHandler}
             >
-                {yAxisGrid &&
+                {yGrid &&
                     yScale.ticks(4).map((tick, index) => (
                         <Line
                             key={index}
@@ -64,28 +65,37 @@ const Graph = ({ barWidth, canvasHeight, progress, data }: Props) => {
                         />
                     ))}
 
-                {data.map((dataPoint: Data, _index: number) => (
-                    <Group key={x(dataPoint.date)}>
-                        <XAxisText
-                            x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction
-                            y={canvasHeight}
-                            text={dataPoint.label}
-                            index={_index}
-                            height={graphHeight}
-                            graphMargin={graphMargin}
-                            barWidth={barWidth}
-                            grid={xAxisGrid}
-                        />
-                        <BarPath
-                            x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction
-                            y={y(dataPoint.value)}
-                            barWidth={barWidth}
-                            barColor={'#7F82F5'}
-                            graphHeight={graphHeight}
-                            progress={progress}
-                        />
-                    </Group>
-                ))}
+                {data.map((dataPoint: Data, _index: number) => {
+                    var yValue=y(dataPoint.value)
+                    if(minBarValue>0)
+                    {
+                        yValue=y(dataPoint.value)===0?10:y(dataPoint.value)
+                    }
+                    return (
+
+                        <Group key={x(dataPoint.date)}>
+                            <XAxisText
+                                x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction
+                                y={canvasHeight}
+                                text={dataPoint.label}
+                                index={_index}
+                                height={graphHeight}
+                                graphMargin={graphMargin}
+                                barWidth={barWidth}
+                                grid={xGrid}
+                            />
+                            <BarPath
+                                x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction
+                                y={yValue}
+                                barWidth={barWidth}
+                                barColor={'#7F82F5'}
+                                graphHeight={graphHeight}
+                                progress={progress}
+                            />
+                        </Group>
+                    )
+                })
+                }
             </Canvas>
         </Animated.View >
 
