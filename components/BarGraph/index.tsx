@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Canvas, Group, Line } from '@shopify/react-native-skia';
-import { StyleSheet, View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, SafeAreaView, ScrollView, TouchableOpacity, GestureResponderEvent } from 'react-native'
 import { hourData, weekData, monthData, Data, sixMonthData, yearData } from './data';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import { Dimensions } from 'react-native';
@@ -140,6 +140,7 @@ function BarGraph() {
     noBarTab: number;
     barWidth: number;
   }
+
   useEffect(() => {
     const tabSettings: Record<string, TabSettings> = {
       'D': { data: hourData, noBarTab: 24, barWidth: 8 },
@@ -155,6 +156,22 @@ function BarGraph() {
     setBarWidth(barWidth);
   }, [selectTab]);
 
+  const touchHandler = (e: GestureResponderEvent) => {
+    const touchX = e.nativeEvent.locationX
+    const touchY = e.nativeEvent.locationY
+
+    const index = Math.floor((touchX - barWidth / 2) / x.step())
+    if (index > -1 && index < data.length + 1) {
+      const { label, date, value } = data[data.length - index]
+      if (graphWidth - touchX < x(date)! + barWidth &&
+        graphWidth - touchX > x(date)! - (barWidth * 1.5) &&
+        touchY - barWidth > graphHeight - y(value)! &&
+        touchY - barWidth < graphHeight
+      ) {
+        console.log(date)
+      }
+    }
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.sectionTitleContainer}>
@@ -186,6 +203,7 @@ function BarGraph() {
                 height: canvasHeight,
                 width: graphWidth,
               }}
+              onTouchStart={touchHandler}
             >
               {yAxisGrid && yScale.ticks(4).map((tick, index) => (
                 <Line
