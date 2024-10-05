@@ -15,9 +15,6 @@ const BarPath = ({ x, y, barWidth, barColor, graphHeight, progress }: Props) => 
 
     const path = useDerivedValue(() => {
         const barPath = Skia.Path.Make();
-        if(y===0){
-            y=10
-        }
         barPath.addRRect({
             rect: {
                 x: x! + barWidth / 2, //this  initial x point (to make it center we subtract half width of bar)
