@@ -17,7 +17,7 @@ type Props = {
 }
 const AnimatedText = ({ selectedValue, startDuration,endDuration }: Props) => {
 
-    const animatedText = useDerivedValue(() =>  `${Math.round(selectedValue.value)}`);
+    const animatedText = useDerivedValue(() =>  `${Math.round(selectedValue.value)} steps`);
 
     const fontSize = font.measureText(`${Math.round(selectedValue.value)}`);
 
@@ -32,8 +32,8 @@ const AnimatedText = ({ selectedValue, startDuration,endDuration }: Props) => {
                     />
 
                 </Canvas>
-                <View style={{ height: fontStyle.fontSize + 8, flex: 6, flexDirection: "row", alignContent: "center", alignItems: "center", gap: 2 }}>
-                    <Text style={{ fontSize: 20, fontWeight: 500 }}>steps</Text>
+                <View style={{ height: fontStyle.fontSize + 8, flex: 2, flexDirection: "row",justifyContent:'flex-start', alignContent: "center", alignItems: "center", gap: 2 }}>
+                    {/* <Text style={{ fontSize: 20, fontWeight: 500 }}>steps</Text> */}
                     <Text style={{ fontSize: 14, fontWeight: 500, color: 'grey' }}>average daily</Text>
                 </View>
             </View>

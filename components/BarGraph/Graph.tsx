@@ -1,7 +1,7 @@
 import React from 'react';
-import { Canvas, Group, Line, } from '@shopify/react-native-skia';
+import { Canvas, Group, Line, RoundedRect } from '@shopify/react-native-skia';
 import { Data } from './data';
-import Animated, { Easing, FadeIn, FadeOut, SharedValue, } from 'react-native-reanimated';
+import Animated, { Easing, FadeIn, FadeOut, SharedValue, useDerivedValue, withTiming } from 'react-native-reanimated';
 import * as d3 from 'd3';
 import BarPath from './BarPath';
 import XAxisText from './XAxisText';
@@ -14,9 +14,11 @@ type Props = {
     xGrid: boolean
     yGrid: boolean
     minBarValue?: number
+    touchHandler: any
 }
 
-const Graph = ({ barWidth, canvasHeight, progress, data, xGrid = true, yGrid = true, minBarValue = 0 }: Props) => {
+const Graph = ({ barWidth, canvasHeight, progress, data, xGrid = true,
+    yGrid = true, minBarValue = 0, touchHandler }: Props) => {
 
     const yAxisWidth = 30;
 
@@ -42,6 +44,7 @@ const Graph = ({ barWidth, canvasHeight, progress, data, xGrid = true, yGrid = t
         .scaleLinear()
         .domain(yDomain) // Define the domain based on your data
         .range([graphHeight, 0]);
+
     return (
 
         <Animated.View
@@ -52,7 +55,7 @@ const Graph = ({ barWidth, canvasHeight, progress, data, xGrid = true, yGrid = t
                     height: canvasHeight,
                     width: graphWidth,
                 }}
-            // onTouchStart={touchHandler}
+                onTouchStart={touchHandler}
             >
                 {yGrid &&
                     yScale.ticks(4).map((tick, index) => (
@@ -66,33 +69,39 @@ const Graph = ({ barWidth, canvasHeight, progress, data, xGrid = true, yGrid = t
                     ))}
 
                 {data.map((dataPoint: Data, _index: number) => {
-                    var yValue=y(dataPoint.value)
-                    if(minBarValue>0)
-                    {
-                        yValue=y(dataPoint.value)===0?10:y(dataPoint.value)
+                    var yValue = y(dataPoint.value)
+                    if (minBarValue > 0) {
+                        yValue = y(dataPoint.value) === 0 ? 10 : y(dataPoint.value)
                     }
                     return (
+                        <>
+                            {/* <Canvas style={{ height: 40, width: graphWidth }}> */}
+                                <RoundedRect x={graphWidth - x(dataPoint.date)!} y={0} width={120} height={40} r={12}
+                                    color={'lightgrey'} />
 
-                        <Group key={x(dataPoint.date)}>
-                            <XAxisText
-                                x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction
-                                y={canvasHeight}
-                                text={dataPoint.label}
-                                index={_index}
-                                height={graphHeight}
-                                graphMargin={graphMargin}
-                                barWidth={barWidth}
-                                grid={xGrid}
-                            />
-                            <BarPath
-                                x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction
-                                y={yValue}
-                                barWidth={barWidth}
-                                barColor={'#7F82F5'}
-                                graphHeight={graphHeight}
-                                progress={progress}
-                            />
-                        </Group>
+                            {/* </Canvas> */}
+
+                            <Group key={x(dataPoint.date)}>
+                                <XAxisText
+                                    x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction
+                                    y={canvasHeight}
+                                    text={dataPoint.label}
+                                    index={_index}
+                                    height={graphHeight}
+                                    graphMargin={graphMargin}
+                                    barWidth={barWidth}
+                                    grid={xGrid}
+                                />
+                                <BarPath
+                                    x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction
+                                    y={yValue}
+                                    barWidth={barWidth}
+                                    barColor={'#7F82F5'}
+                                    graphHeight={graphHeight}
+                                    progress={progress}
+                                />
+                            </Group>
+                        </>
                     )
                 })
                 }
