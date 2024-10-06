@@ -1,5 +1,5 @@
 import { Platform, View } from 'react-native';
-import { Canvas, Fill, Group, Line, Rect, RoundedRect, Shadow, Text as SkiaText, matchFont } from '@shopify/react-native-skia';
+import { Canvas, RoundedRect, Text as SkiaText, matchFont } from '@shopify/react-native-skia';
 import { SharedValue, useDerivedValue } from 'react-native-reanimated';
 
 const fontFamily = Platform.select({ ios: 'Helvetica', default: 'serif' });
@@ -40,10 +40,12 @@ const Tooltip = ({ selectedValue, dateValue, showTooltip, xTooltipValue,width }:
       shadowRadius: 4,
       elevation: 5,
       height: 55,
-      marginHorizontal: 16
+      marginHorizontal: 16,
     }}>
       {showTooltip &&
         <Canvas style={{ height: valueFontStyle.fontSize + 40, width:width}}>
+          <RoundedRect x={xTooltipValue} y={0} width={120} height={valueFontStyle.fontSize + 34} r={12}
+           color="grey" />
           <RoundedRect x={xTooltipValue} y={0} width={120} height={valueFontStyle.fontSize + 34} r={12}
             color="white" />
           <SkiaText

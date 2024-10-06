@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 13,
-    fontWeight: 500,
+   // fontWeight: 500,
     paddingHorizontal: 8,
     paddingVertical: 4,
     textAlign: 'center',

@@ -116,14 +116,16 @@ function BarGraph() {
       scrollRef.current.scrollToEnd({ animated: false });
     }
   };
+  const [scrollX, setScrollX] = useState(0); // Track scroll offset
 
   const onScroll = (event: any) => {
     const currentPosition = event.nativeEvent.contentOffset.x; // Current scroll position
-
+    setScrollX(currentPosition); // Update the scroll position
+   
     const contentWidth = event.nativeEvent.contentSize.width; // Total width of the scrollable content
     const layoutWidth = event.nativeEvent.layoutMeasurement.width; // Width of the visible area
     const barSpacingWithBarWidth = barWidth + barSpacing; // Total width of one bar with its spacing
-
+    console.log(currentPosition-layoutWidth+contentWidth,)
     // Calculate the maximum scrollable position (max scroll)
     const maxScroll = contentWidth - layoutWidth;
     if (currentPosition < maxScroll) {
@@ -186,10 +188,13 @@ function BarGraph() {
         if(a===noBarTab){
         xpos=0
         }
+        console.log(
+          width,
+          graphWidth,
+          Math.round(touchX),
+        scrollX)
         selectedBar.value = label;
-        console.log(xpos,(noBarTab)*(barWidth))
-        console.log(a)
-        setShowTooltip(true)
+       setShowTooltip(true)
         tooltipValue.value = value;
         xTooltipValue.value = xpos
         dateValue.value = date;
@@ -245,7 +250,6 @@ function BarGraph() {
                   yGrid={false}
                   minBarValue={10}
                   touchHandler={touchHandler}
-                  selectedBar={selectedBar}
                 />
               )
             }
@@ -260,7 +264,6 @@ function BarGraph() {
                   yGrid={false}
                   minBarValue={10}
                   touchHandler={touchHandler}
-                  selectedBar={selectedBar}
                 />
               )
             }
@@ -275,7 +278,6 @@ function BarGraph() {
                   yGrid={false}
                   minBarValue={10}
                   touchHandler={touchHandler}
-                  selectedBar={selectedBar}
                 />
               )
             }
@@ -290,7 +292,6 @@ function BarGraph() {
                   yGrid={false}
                   minBarValue={10}
                   touchHandler={touchHandler}
-                  selectedBar={selectedBar}
                 />
               )
             }
@@ -305,7 +306,6 @@ function BarGraph() {
                   yGrid={false}
                   minBarValue={10}
                   touchHandler={touchHandler}
-                  selectedBar={selectedBar}
                 />
               )
             }
