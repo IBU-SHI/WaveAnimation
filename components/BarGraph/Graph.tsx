@@ -15,10 +15,11 @@ type Props = {
     yGrid: boolean
     minBarValue?: number
     touchHandler: any
+    selectBar?:SharedValue<string | null>
 }
 
 const Graph = ({ barWidth, canvasHeight, progress, data, xGrid = true,
-    yGrid = true, minBarValue = 0, touchHandler }: Props) => {
+    yGrid = true, minBarValue = 0, touchHandler,selectBar }: Props) => {
 
     const yAxisWidth = 30;
 
@@ -45,6 +46,7 @@ const Graph = ({ barWidth, canvasHeight, progress, data, xGrid = true,
         .domain(yDomain) // Define the domain based on your data
         .range([graphHeight, 0]);
   
+        
     return (
 
         <Animated.View
@@ -85,6 +87,8 @@ const Graph = ({ barWidth, canvasHeight, progress, data, xGrid = true,
                             graphMargin={graphMargin}
                             barWidth={barWidth}
                             grid={xGrid}
+                            date={dataPoint.date}
+                            selectBar={selectBar!}
                           />
                           <BarPath
                             x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction

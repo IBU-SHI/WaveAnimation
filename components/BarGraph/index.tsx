@@ -198,6 +198,7 @@ function BarGraph() {
         tooltipValue.value = value;
         xTooltipValue.value = xpos
         dateValue.value = date;
+        selectedBar.value= date
       }
       else {
         setShowTooltip(false)
@@ -264,6 +265,7 @@ function BarGraph() {
                   yGrid={false}
                   minBarValue={10}
                   touchHandler={touchHandler}
+                  selectBar={selectedBar}
                 />
               )
             }
