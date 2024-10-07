@@ -40,19 +40,23 @@ function BarGraph() {
   const [yAxisData, setYAxisData] = useState(data.slice(0, 25)); //current week data ....more testing need
   const [startDuration, setStartDuration] = useState('');
   const [endDuration, setEndDuration] = useState('');
-  const [selectTab, setSelectTab] = useState('D');
+  const [selectTab, setSelectTab] = useState('W');
+  const [showTooltip, setShowTooltip] = useState(false)
 
   const scrollRef = useRef<ScrollView>(null); // this scroll view ref of horizontal graph
-
+  
+  const selectedBar = useSharedValue<string | null>(null);
   const progess = useSharedValue<number>(0); // this is progress value use for animation
   const selectedValue = useSharedValue<number>(0); // this is selected value (for tool tip purpose in future)
   const tooltipValue = useSharedValue<number>(0); // this is tooltip value (for tool tip purpose in future)
   const dateValue = useSharedValue<string>(''); // this is date value (for tool tip purpose in future)
   const xTooltipValue = useSharedValue<number>(10); // this is tooltip x value (for tool tip purpose in future)
+  const adiff = useSharedValue<number>(0); // this is tooltip x value (for tool tip purpose in future)
+
   const totalValue = currentData.reduce((acc, cur) => acc + cur.value, 0); // this will get total value of steps (we need avg steps in future)
   const averageValue = totalValue / currentData.length; //average value of current visible data
 
-  const canvasHeight = height / 3; //this is height of canvas (height of container/paper where graph can be drawn) it can be customize
+  const canvasHeight = 200//height / 3; //this is height of canvas (height of container/paper where graph can be drawn) it can be customize
   const canvasWidth = width; //this is width of canvas (width of container/paper where graph can be drawn)
 
   const yAxisWidth = 30;
@@ -92,12 +96,13 @@ function BarGraph() {
   }, [progess, selectedValue, averageValue]);
 
   useEffect(() => {
+    setShowTooltip(false)
     const tabSettings: Record<string, TabSettings> = {
       D: { data: hourData, noBarTab: 24, barWidth: 8 },
       W: { data: weekData, noBarTab: 7, barWidth: 25 },
       M: { data: monthData, noBarTab: 30, barWidth: 6 },
       '6M': { data: sixMonthData, noBarTab: 24, barWidth: 8 },
-      Y: { data: yearData, noBarTab: 7, barWidth: 16 },
+      Y: { data: yearData, noBarTab: 12, barWidth: 16 },
     };
 
     const { data, noBarTab, barWidth } =
@@ -105,6 +110,8 @@ function BarGraph() {
     setData(data);
     setNoBarTab(noBarTab);
     setBarWidth(barWidth);
+    setScrollX(0)
+    selectedBar.value= null
   }, [selectTab]);
 
   const scrollToEnd = () => {
@@ -112,9 +119,16 @@ function BarGraph() {
       scrollRef.current.scrollToEnd({ animated: false });
     }
   };
+  const [scrollX, setScrollX] = useState(0); // Track scroll offset
 
   const onScroll = (event: any) => {
     const currentPosition = event.nativeEvent.contentOffset.x; // Current scroll position
+
+    const a = currentPosition - scrollX
+    if (scrollX > 0) {
+      adiff.value = currentPosition - scrollX
+    }
+    setScrollX(a); // Update the scroll position
 
     const contentWidth = event.nativeEvent.contentSize.width; // Total width of the scrollable content
     const layoutWidth = event.nativeEvent.layoutMeasurement.width; // Width of the visible area
@@ -130,7 +144,7 @@ function BarGraph() {
         data.length -
         Math.ceil(
           (currentPosition +
-            event.nativeEvent.layoutMeasurement.width -
+            layoutWidth -
             (barWidth + barSpacing * 1.5)) /
           barSpacingWithBarWidth,
         ); // Ending bar based on scroll + visible width
@@ -176,10 +190,29 @@ function BarGraph() {
         touchY - barWidth > graphHeight - y(value)! &&
         touchY - barWidth < graphHeight
       ) {
-        const xpos = ((index % 7) - 1) * x.step() + barWidth / 2;
+        const a = Math.round((x(date)!) / x.step())
+        var b = a % (noBarTab)
+        var tooltipWidth = 120
+        if (b === 0) {
+          b = noBarTab
+        }
 
-        tooltipValue.value = withTiming(value, { duration: 1 });
+        var xpos = width - (b * x.step()) - tooltipWidth
+        if (noBarTab > 7) {
+          xpos = xpos + Math.round((adiff.value)) * 2
+        }
+        if (xpos < 0) {
+          xpos = 0
+        }
+        setShowTooltip(true)
+        tooltipValue.value = value;
+        xTooltipValue.value = xpos
         dateValue.value = date;
+        selectedBar.value= date
+      }
+      else {
+        setShowTooltip(false)
+        selectedBar.value= null
       }
     }
   };
@@ -200,7 +233,12 @@ function BarGraph() {
         />
 
         <Segment selectTab={selectTab} setSelectTab={setSelectTab} />
-
+        <Tooltip
+          selectedValue={tooltipValue!}
+          dateValue={dateValue!}
+          showTooltip={showTooltip}
+          xTooltipValue={xTooltipValue!}
+          width={graphWidth} />
         <View style={styles.chart}>
           <ScrollView
             horizontal
@@ -222,6 +260,9 @@ function BarGraph() {
                   xGrid={false}
                   yGrid={false}
                   minBarValue={10}
+                  touchHandler={touchHandler}
+                  selectBar={selectedBar}
+
                 />
               )
             }
@@ -235,6 +276,8 @@ function BarGraph() {
                   xGrid={false}
                   yGrid={false}
                   minBarValue={10}
+                  touchHandler={touchHandler}
+                  selectBar={selectedBar}
                 />
               )
             }
@@ -248,6 +291,8 @@ function BarGraph() {
                   xGrid={false}
                   yGrid={false}
                   minBarValue={10}
+                  touchHandler={touchHandler}
+                  selectBar={selectedBar}
                 />
               )
             }
@@ -261,6 +306,8 @@ function BarGraph() {
                   xGrid={false}
                   yGrid={false}
                   minBarValue={10}
+                  touchHandler={touchHandler}
+                  selectBar={selectedBar}
                 />
               )
             }
@@ -274,12 +321,14 @@ function BarGraph() {
                   xGrid={false}
                   yGrid={false}
                   minBarValue={10}
+                  touchHandler={touchHandler}
+                  selectBar={selectedBar}
                 />
               )
             }
           </ScrollView>
 
-          <Canvas style={{ height: canvasHeight, width: yAxisWidth }}>
+          <Canvas style={{ height: canvasHeight - 40, width: yAxisWidth }}>
             {yScale.ticks(4).map((tick, index) => (
               <YAxisText
                 key={index}
