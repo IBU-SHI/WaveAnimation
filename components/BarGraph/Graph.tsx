@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Canvas, Group, Line } from '@shopify/react-native-skia';
 import { Data } from './data';
 import Animated, { Easing, FadeIn, FadeOut, SharedValue } from 'react-native-reanimated';
 import * as d3 from 'd3';
 import BarPath from './BarPath';
 import XAxisText from './XAxisText';
+import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import Tooltip from './Tooltip';
 
 type Props = {
     barWidth: number
@@ -45,10 +47,8 @@ const Graph = ({ barWidth, canvasHeight, progress, data, xGrid = true,
         .scaleLinear()
         .domain(yDomain) // Define the domain based on your data
         .range([graphHeight, 0]);
-  
-        
-    return (
 
+    return (
         <Animated.View
             entering={FadeIn.duration(700).easing(Easing.ease)}
             exiting={FadeOut}>
@@ -76,30 +76,32 @@ const Graph = ({ barWidth, canvasHeight, progress, data, xGrid = true,
                         yValue = y(dataPoint.value) === 0 ? 10 : y(dataPoint.value)
                     }
                     return (
-                      
+
                         <Group key={x(dataPoint.date)}>
-                          <XAxisText
-                            x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction
-                            y={canvasHeight}
-                            text={dataPoint.label}
-                            index={_index}
-                            height={graphHeight}
-                            graphMargin={graphMargin}
-                            barWidth={barWidth}
-                            grid={xGrid}
-                            date={dataPoint.date}
-                            selectBar={selectBar!}
-                          />
-                          <BarPath
-                            x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction
-                            y={yValue}
-                            barWidth={barWidth}
-                            barColor={'#7F82F5'}
-                            graphHeight={graphHeight}
-                            progress={progress}
-                          />
+                            <XAxisText
+                                x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction
+                                y={canvasHeight}
+                                text={dataPoint.label}
+                                index={_index}
+                                height={graphHeight}
+                                graphMargin={graphMargin}
+                                barWidth={barWidth}
+                                grid={xGrid}
+                            />
+
+                            <BarPath
+                                x={graphWidth - x(dataPoint.date)!} // here value is minus width becuase we need to scroll opposite direction
+                                y={yValue}
+                                barWidth={barWidth}
+                                barColor={'#7F82F5'}
+                                graphHeight={graphHeight}
+                                progress={progress}
+                                date={dataPoint.date}
+                                selectBar={selectBar!}
+                            />
+
                         </Group>
-                      
+
                     );
                 })
                 }
@@ -108,5 +110,30 @@ const Graph = ({ barWidth, canvasHeight, progress, data, xGrid = true,
 
     )
 }
-
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    canvas: {
+        height: 200,
+        backgroundColor: 'white',
+    },
+    tooltip: {
+        position: 'absolute',
+        width: 120,
+        height: 40,
+        backgroundColor: 'white',
+        borderRadius: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    tooltipText: {
+        color: 'black',
+        fontSize: 16,
+    },
+});
 export default Graph

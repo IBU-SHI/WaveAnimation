@@ -25,12 +25,19 @@ type Props = {
   width:number
 };
 const Tooltip = ({ selectedValue, dateValue, showTooltip, xTooltipValue,width }: Props) => {
-  const animatedText = useDerivedValue(
-    () => ` ${Math.round(selectedValue.value)} steps`,
-  );
-  // Animated text for date value
-  const animatedDateText = useDerivedValue(() => ` ${dateValue.value}`);
-
+  const animatedText = useDerivedValue(() => {
+    if (selectedValue?.value !== undefined) {
+      return ` ${Math.round(selectedValue.value)} steps`;
+    }
+    return 'No steps';
+  });
+  
+  const animatedDateText = useDerivedValue(() => {
+    if (dateValue?.value !== undefined) {
+      return ` ${dateValue.value}`;
+    }
+    return 'No date';
+  });
   const fontSize = valueFont.measureText(animatedText.value);
   return (
     <View style={{

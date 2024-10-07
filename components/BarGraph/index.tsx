@@ -44,14 +44,15 @@ function BarGraph() {
   const [showTooltip, setShowTooltip] = useState(false)
 
   const scrollRef = useRef<ScrollView>(null); // this scroll view ref of horizontal graph
-
+  
+  const selectedBar = useSharedValue<string | null>(null);
   const progess = useSharedValue<number>(0); // this is progress value use for animation
   const selectedValue = useSharedValue<number>(0); // this is selected value (for tool tip purpose in future)
   const tooltipValue = useSharedValue<number>(0); // this is tooltip value (for tool tip purpose in future)
   const dateValue = useSharedValue<string>(''); // this is date value (for tool tip purpose in future)
   const xTooltipValue = useSharedValue<number>(10); // this is tooltip x value (for tool tip purpose in future)
-  
-  const selectedBar = useSharedValue<string | null>(null);
+  const adiff = useSharedValue<number>(0); // this is tooltip x value (for tool tip purpose in future)
+
   const totalValue = currentData.reduce((acc, cur) => acc + cur.value, 0); // this will get total value of steps (we need avg steps in future)
   const averageValue = totalValue / currentData.length; //average value of current visible data
 
@@ -109,6 +110,8 @@ function BarGraph() {
     setData(data);
     setNoBarTab(noBarTab);
     setBarWidth(barWidth);
+    setScrollX(0)
+    selectedBar.value= null
   }, [selectTab]);
 
   const scrollToEnd = () => {
@@ -120,12 +123,17 @@ function BarGraph() {
 
   const onScroll = (event: any) => {
     const currentPosition = event.nativeEvent.contentOffset.x; // Current scroll position
-    setScrollX(currentPosition); // Update the scroll position
-   
+
+    const a = currentPosition - scrollX
+    if (scrollX > 0) {
+      adiff.value = currentPosition - scrollX
+    }
+    setScrollX(a); // Update the scroll position
+
     const contentWidth = event.nativeEvent.contentSize.width; // Total width of the scrollable content
     const layoutWidth = event.nativeEvent.layoutMeasurement.width; // Width of the visible area
     const barSpacingWithBarWidth = barWidth + barSpacing; // Total width of one bar with its spacing
-    console.log(currentPosition-layoutWidth+contentWidth,)
+
     // Calculate the maximum scrollable position (max scroll)
     const maxScroll = contentWidth - layoutWidth;
     if (currentPosition < maxScroll) {
@@ -136,7 +144,7 @@ function BarGraph() {
         data.length -
         Math.ceil(
           (currentPosition +
-            event.nativeEvent.layoutMeasurement.width -
+            layoutWidth -
             (barWidth + barSpacing * 1.5)) /
           barSpacingWithBarWidth,
         ); // Ending bar based on scroll + visible width
@@ -182,19 +190,21 @@ function BarGraph() {
         touchY - barWidth > graphHeight - y(value)! &&
         touchY - barWidth < graphHeight
       ) {
-        const a = Math.round((x(date)!)/x.step())
-        var b =noBarTab-a%noBarTab
-        var xpos = b*x.step() - barWidth
-        if(a===noBarTab){
-        xpos=0
+        const a = Math.round((x(date)!) / x.step())
+        var b = a % (noBarTab)
+        var tooltipWidth = 120
+        if (b === 0) {
+          b = noBarTab
         }
-        console.log(
-          width,
-          graphWidth,
-          Math.round(touchX),
-        scrollX)
-        selectedBar.value = label;
-       setShowTooltip(true)
+
+        var xpos = width - (b * x.step()) - tooltipWidth
+        if (noBarTab > 7) {
+          xpos = xpos + Math.round((adiff.value)) * 2
+        }
+        if (xpos < 0) {
+          xpos = 0
+        }
+        setShowTooltip(true)
         tooltipValue.value = value;
         xTooltipValue.value = xpos
         dateValue.value = date;
@@ -202,7 +212,7 @@ function BarGraph() {
       }
       else {
         setShowTooltip(false)
-        selectedBar.value = null;
+        selectedBar.value= null
       }
     }
   };
@@ -224,11 +234,11 @@ function BarGraph() {
 
         <Segment selectTab={selectTab} setSelectTab={setSelectTab} />
         <Tooltip
-          selectedValue={tooltipValue}
-          dateValue={dateValue}
+          selectedValue={tooltipValue!}
+          dateValue={dateValue!}
           showTooltip={showTooltip}
-          xTooltipValue={xTooltipValue} 
-          width={graphWidth}/>
+          xTooltipValue={xTooltipValue!}
+          width={graphWidth} />
         <View style={styles.chart}>
           <ScrollView
             horizontal
@@ -251,6 +261,8 @@ function BarGraph() {
                   yGrid={false}
                   minBarValue={10}
                   touchHandler={touchHandler}
+                  selectBar={selectedBar}
+
                 />
               )
             }
@@ -280,6 +292,7 @@ function BarGraph() {
                   yGrid={false}
                   minBarValue={10}
                   touchHandler={touchHandler}
+                  selectBar={selectedBar}
                 />
               )
             }
@@ -294,6 +307,7 @@ function BarGraph() {
                   yGrid={false}
                   minBarValue={10}
                   touchHandler={touchHandler}
+                  selectBar={selectedBar}
                 />
               )
             }
@@ -308,12 +322,13 @@ function BarGraph() {
                   yGrid={false}
                   minBarValue={10}
                   touchHandler={touchHandler}
+                  selectBar={selectedBar}
                 />
               )
             }
           </ScrollView>
 
-          <Canvas style={{ height: canvasHeight-40, width: yAxisWidth }}>
+          <Canvas style={{ height: canvasHeight - 40, width: yAxisWidth }}>
             {yScale.ticks(4).map((tick, index) => (
               <YAxisText
                 key={index}
