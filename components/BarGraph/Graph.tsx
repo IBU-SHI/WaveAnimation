@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Canvas, Group, Line } from '@shopify/react-native-skia';
 import { Data } from './data';
 import Animated, { Easing, FadeIn, FadeOut, SharedValue } from 'react-native-reanimated';
 import * as d3 from 'd3';
 import BarPath from './BarPath';
 import XAxisText from './XAxisText';
-import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
-import Tooltip from './Tooltip';
+import { StyleSheet} from 'react-native';
 
 type Props = {
     barWidth: number
@@ -50,8 +49,9 @@ const Graph = ({ barWidth, canvasHeight, progress, data, xGrid = true,
 
     return (
         <Animated.View
-            entering={FadeIn.duration(700).easing(Easing.ease)}
-            exiting={FadeOut}>
+            entering={FadeIn.duration(1000).easing(Easing.ease)}
+            exiting={FadeOut}
+            >
             <Canvas
                 style={{
                     height: canvasHeight,
@@ -63,8 +63,8 @@ const Graph = ({ barWidth, canvasHeight, progress, data, xGrid = true,
                     yScale.ticks(4).map((tick, index) => (
                         <Line
                             key={index}
-                            p1={{ x: 0, y: yScale(tick) + graphMargin / 2 }} // Start of the line
-                            p2={{ x: graphWidth, y: yScale(tick) + graphMargin / 2 }} // End of the line
+                            p1={{ x: 0, y: yScale(tick) }} // Start of the line
+                            p2={{ x: graphWidth, y: yScale(tick)  }} // End of the line
                             color="gray" // Light gray for the grid lines
                             strokeWidth={0.5}
                         />

@@ -16,8 +16,7 @@ import {
   sixMonthData,
   yearData,
 } from './data';
-import { useSharedValue, withTiming } from 'react-native-reanimated';
-import { Dimensions } from 'react-native';
+import { useSharedValue, withTiming} from 'react-native-reanimated';
 import * as d3 from 'd3';
 import Legend from './Legend';
 import YAxisText from './YAxisText';
@@ -25,7 +24,6 @@ import Tooltip from './Tooltip';
 import Graph from './Graph';
 import Segment from './Segment';
 
-const { width, height } = Dimensions.get('window');
 interface TabSettings {
   data: Data[]; // Adjust the type based on your actual data type
   noBarTab: number;
@@ -37,27 +35,24 @@ function BarGraph() {
   const [noBarTab, setNoBarTab] = useState(24); // it is for no of hour,days,week,month as per tab value
   const [barWidth, setBarWidth] = useState(8); // width of bar and it will be dynamic in future
   const [currentData, setCurrentData] = useState(data.slice(0, 24)); //current week data ....more testing need
-  const [yAxisData, setYAxisData] = useState(data.slice(0, 25)); //current week data ....more testing need
   const [startDuration, setStartDuration] = useState('');
   const [endDuration, setEndDuration] = useState('');
-  const [selectTab, setSelectTab] = useState('W');
+  const [selectTab, setSelectTab] = useState('D');
   const [showTooltip, setShowTooltip] = useState(false)
 
   const scrollRef = useRef<ScrollView>(null); // this scroll view ref of horizontal graph
-  
+
   const selectedBar = useSharedValue<string | null>(null);
   const progess = useSharedValue<number>(0); // this is progress value use for animation
   const selectedValue = useSharedValue<number>(0); // this is selected value (for tool tip purpose in future)
   const tooltipValue = useSharedValue<number>(0); // this is tooltip value (for tool tip purpose in future)
   const dateValue = useSharedValue<string>(''); // this is date value (for tool tip purpose in future)
   const xTooltipValue = useSharedValue<number>(10); // this is tooltip x value (for tool tip purpose in future)
-  const adiff = useSharedValue<number>(0); // this is tooltip x value (for tool tip purpose in future)
 
   const totalValue = currentData.reduce((acc, cur) => acc + cur.value, 0); // this will get total value of steps (we need avg steps in future)
   const averageValue = totalValue / currentData.length; //average value of current visible data
 
   const canvasHeight = 200//height / 3; //this is height of canvas (height of container/paper where graph can be drawn) it can be customize
-  const canvasWidth = width; //this is width of canvas (width of container/paper where graph can be drawn)
 
   const yAxisWidth = 30;
 
@@ -79,7 +74,7 @@ function BarGraph() {
   // padding is space between bars
 
   const yRange = [0, graphHeight]; //this is y axis range means scale length starting and ending
-  var yMax = d3.max(yAxisData, (yDataPoint: Data) => yDataPoint.value)! * 1.2; // 20% more than max value for scaling
+  var yMax = d3.max(currentData, (yDataPoint: Data) => yDataPoint.value)! * 1.2; // 20% more than max value for scaling
   const yDomain = [0, yMax]; // this is y axis label till maximum value in the data table
 
   const y = d3.scaleLinear().domain(yDomain).range(yRange); // this is line which made by connecting values of data
@@ -92,7 +87,7 @@ function BarGraph() {
 
   useEffect(() => {
     progess.value = withTiming(1, { duration: 1000 });
-    selectedValue.value = withTiming(averageValue, { duration: 1000 }); // here if we change duration to 1000 than animation will show ..at current condition no
+    selectedValue.value = withTiming(averageValue, { duration: 1 }); // here if we change duration to 1000 than animation will show ..at current condition no
   }, [progess, selectedValue, averageValue]);
 
   useEffect(() => {
@@ -110,8 +105,7 @@ function BarGraph() {
     setData(data);
     setNoBarTab(noBarTab);
     setBarWidth(barWidth);
-    setScrollX(0)
-    selectedBar.value= null
+    selectedBar.value = null
   }, [selectTab]);
 
   const scrollToEnd = () => {
@@ -119,61 +113,30 @@ function BarGraph() {
       scrollRef.current.scrollToEnd({ animated: false });
     }
   };
-  const [scrollX, setScrollX] = useState(0); // Track scroll offset
 
   const onScroll = (event: any) => {
+
     const currentPosition = event.nativeEvent.contentOffset.x; // Current scroll position
-
-    const a = currentPosition - scrollX
-    if (scrollX > 0) {
-      adiff.value = currentPosition - scrollX
-    }
-    setScrollX(a); // Update the scroll position
-
     const contentWidth = event.nativeEvent.contentSize.width; // Total width of the scrollable content
     const layoutWidth = event.nativeEvent.layoutMeasurement.width; // Width of the visible area
-    const barSpacingWithBarWidth = barWidth + barSpacing; // Total width of one bar with its spacing
 
     // Calculate the maximum scrollable position (max scroll)
     const maxScroll = contentWidth - layoutWidth;
     if (currentPosition < maxScroll) {
-      // Calculate the visible start and end indices
-      var start =
-        data.length - Math.floor(currentPosition / barSpacingWithBarWidth); // Starting bar based on scroll
-      var end =
-        data.length -
-        Math.ceil(
-          (currentPosition +
-            layoutWidth -
-            (barWidth + barSpacing * 1.5)) /
-          barSpacingWithBarWidth,
-        ); // Ending bar based on scroll + visible width
-      if (start > 0 && end < data.length - noBarTab - 1) {
-        start = start - 2;
-        end = end - 1;
-      } else {
-        start = start - 1;
-      }
-      setStartDuration(data[end]?.date);
-      setEndDuration(data[start]?.date);
-      const currentVisibleItems = data.slice(end, start + 1);
-      setCurrentData(currentVisibleItems);
-      const totalValue = currentVisibleItems.reduce(
-        (acc, cur) => acc + cur.value,
-        0,
-      ); // this will get total value of steps (we need avg steps in future)
-      const averageValue = totalValue / currentVisibleItems.length;
-      if (averageValue > 0) {
-        const currentVisibleYAxis = data.slice(end, start + 2);
-        setYAxisData(currentVisibleYAxis);
+      if (currentPosition - x.step() > 0) {
+        var nEnd = data.length - Math.floor(currentPosition / x.step())
+        const nStart = nEnd - Math.floor(layoutWidth / x.step())
+        if (nEnd > data.length) {
+          nEnd = data.length - 1
+        }
+        setStartDuration(data[nStart]?.date);
+        setEndDuration(data[nEnd]?.date);
+        setCurrentData(data.slice(nStart, nEnd + 1));
       }
     } else {
       setStartDuration(data[0]?.date);
       setEndDuration(data[noBarTab - 1]?.date);
-      const currentVisibleItems = data.slice(0, noBarTab);
-      setCurrentData(currentVisibleItems);
-      const currentVisibleYAxis = data.slice(0, noBarTab + 1);
-      setYAxisData(currentVisibleYAxis);
+      setCurrentData(data.slice(0, noBarTab));
     }
   };
 
@@ -190,17 +153,8 @@ function BarGraph() {
         touchY - barWidth > graphHeight - y(value)! &&
         touchY - barWidth < graphHeight
       ) {
-        const a = Math.round((x(date)!) / x.step())
-        var b = a % (noBarTab)
-        var tooltipWidth = 120
-        if (b === 0) {
-          b = noBarTab
-        }
-
-        var xpos = width - (b * x.step()) - tooltipWidth
-        if (noBarTab > 7) {
-          xpos = xpos + Math.round((adiff.value)) * 2
-        }
+        const currentIndex = currentData.findIndex((a) => a.date === date);
+        var xpos = ((noBarTab - 1) * x.step()) - currentIndex * x.step() - 60 + barWidth / 2
         if (xpos < 0) {
           xpos = 0
         }
@@ -208,11 +162,11 @@ function BarGraph() {
         tooltipValue.value = value;
         xTooltipValue.value = xpos
         dateValue.value = date;
-        selectedBar.value= date
+        selectedBar.value = date
       }
       else {
         setShowTooltip(false)
-        selectedBar.value= null
+        selectedBar.value = null
       }
     }
   };
@@ -249,7 +203,8 @@ function BarGraph() {
             onContentSizeChange={scrollToEnd}
             contentContainerStyle={{
               flexDirection: 'row-reverse',
-            }}>
+            }}
+          >
             {
               selectTab === 'D' && (
                 <Graph

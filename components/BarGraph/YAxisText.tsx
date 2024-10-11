@@ -23,7 +23,7 @@ type Props = {
 const YAxisText = ({ x, y, text, index, width, barSpacing, graphMargin, grid=true }: Props) => {
     return (
         <>
-            <Text x={x} y={y + 20} color={'#626C77'} text={text} font={font} />
+            <Text x={x} y={y} color={'#626C77'} text={text} font={font} />
             {grid && <Line
                 key={index}
                 p1={{ x: 0, y: y + (graphMargin / 2) }} // Start of the line

@@ -12,35 +12,28 @@ const fontStyle = {
 const font = matchFont(fontStyle);
 type Props = {
     selectedValue: SharedValue<number>
-    startDuration : string
-     endDuration:string
+    startDuration: string
+    endDuration: string
 }
-const AnimatedText = ({ selectedValue, startDuration,endDuration }: Props) => {
+const AnimatedText = ({ selectedValue, startDuration, endDuration }: Props) => {
 
-    const animatedText = useDerivedValue(() =>  `${Math.round(selectedValue.value)} steps`);
+    const animatedText = useDerivedValue(() => `${Math.round(selectedValue.value)} steps`);
 
     const fontSize = font.measureText(`${Math.round(selectedValue.value)}`);
 
     return (
         <View style={styles.legendWrapper} >
-            <View style={{ flexDirection: "row", flex: 1, justifyContent: "flex-start" }}>
-                <Canvas style={{ height: fontStyle.fontSize + 8, flex: 1}}>
+            <View style={{ flexDirection: "row", justifyContent: "flex-start", alignItems: "center" }}>
+                <Canvas style={{ height: fontStyle.fontSize + 4, flex: 0.4 }}>
                     <SkiaText
-                        y={fontSize.height + 4}
+                        y={fontSize.height}
                         text={animatedText}
                         font={font}
                     />
-
                 </Canvas>
-                <View style={{ height: fontStyle.fontSize + 8, flex: 2, flexDirection: "row",justifyContent:'flex-start', alignContent: "center", alignItems: "center", gap: 2 }}>
-                    {/* <Text style={{ fontSize: 20, fontWeight: 500 }}>steps</Text> */}
-                    <Text style={{ fontSize: 14, fontWeight: 500, color: 'grey' }}>average daily</Text>
-                </View>
+                <Text style={{ fontSize: 14, fontWeight: 500, color: 'grey' }}>average daily</Text>
             </View>
-
-            <View style={{ paddingTop: 24 }}>
-                <Text style={{ fontSize: 14, fontWeight: 500, color: 'grey' }}>{startDuration}-{endDuration}</Text>
-            </View>
+            <Text style={{ fontSize: 14, fontWeight: 500, color: 'grey' }}>{startDuration}-{endDuration}</Text>
         </View>
     );
 };
